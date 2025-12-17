@@ -662,4 +662,18 @@ class ProjectsController extends Controller
             return redirect()->back()->with('error', 'Error loading print view: ' . $e->getMessage());
         }
     }
+
+    /**
+     * Export Projects to Excel using Maatwebsite/Laravel-Excel
+     */
+    public function exportExcel()
+    {
+        try {
+            $fileName = 'Projects_' . date('Y-m-d') . '.xlsx';
+            return \Maatwebsite\Excel\Facades\Excel::download(new \App\Exports\ProjectsExport, $fileName);
+        } catch (Exception $e) {
+            Log::error('Projects Excel export error: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Error exporting Excel: ' . $e->getMessage());
+        }
+    }
 }

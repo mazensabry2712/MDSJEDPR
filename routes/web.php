@@ -51,6 +51,8 @@ Route::group(
         /*Project*/
         // Projects PDF Export (must be before resource route)
         Route::get('project/export/pdf', [ProjectsController::class, 'exportPDF'])->name('projects.export.pdf');
+        // Projects Excel Export (must be before resource route)
+        Route::get('project/export/excel', [ProjectsController::class, 'exportExcel'])->name('projects.export.excel');
         // Projects Print View (must be before resource route)
         Route::get('project/print', [ProjectsController::class, 'printView'])->name('projects.print');
 

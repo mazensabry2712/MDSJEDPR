@@ -238,9 +238,9 @@
                                 <i class="fas fa-file-pdf"></i> PDF
                             </a>
 
-                            <button onclick="exportToExcel()" class="btn btn-sm btn-success btn-export-excel mr-1">
+                            <a href="{{ route('projects.export.excel') }}" class="btn btn-sm btn-success btn-export-excel mr-1">
                                 <i class="fas fa-file-excel"></i> Excel
-                            </button>
+                            </a>
 
                             <a href="{{ route('projects.print') }}" class="btn btn-sm btn-secondary btn-export-print mr-2" target="_blank">
                                 <i class="fas fa-print"></i> Print
@@ -264,9 +264,7 @@
                                     <th class="border-bottom-0">PR Number</th>
                                     <th class="border-bottom-0">Project Name</th>
                                     <th class="border-bottom-0">Technologies</th>
-                                    <th class="border-bottom-0">Primary Vendor</th>
                                     <th class="border-bottom-0">All Vendors</th>
-                                    <th class="border-bottom-0">Primary DS</th>
                                     <th class="border-bottom-0">All DS</th>
                                     <th class="border-bottom-0">Customer</th>
                                     <th class="border-bottom-0">Customer PO</th>
@@ -326,7 +324,6 @@
                                                 <span class="text-muted">N/A</span>
                                             @endif
                                         </td>
-                                        <td>{{ $project->vendor->vendors ?? 'N/A' }}</td>
                                         <td>
                                             @if ($project->vendors && $project->vendors->count() > 0)
                                                 @foreach ($project->vendors as $vendor)
@@ -342,7 +339,6 @@
                                                 <span class="text-muted">N/A</span>
                                             @endif
                                         </td>
-                                        <td>{{ $project->ds->dsname ?? 'N/A' }}</td>
                                         <td>
                                             @if ($project->deliverySpecialists && $project->deliverySpecialists->count() > 0)
                                                 @foreach ($project->deliverySpecialists as $ds)

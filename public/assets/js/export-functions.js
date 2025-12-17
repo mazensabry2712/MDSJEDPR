@@ -120,40 +120,103 @@ function generateExcel(button, originalHTML) {
             throw new Error('Table not found');
         }
 
-        // Get headers
+        // Get headers - Skip Actions column only (index 1)
         const headerRow = [];
-        table.querySelectorAll('thead th').forEach((th, index) => {
-            const text = th.textContent.trim();
-            // Skip Operations column
-            if (index === 0 || index > 1 || text.toLowerCase() !== 'operations') {
-                headerRow.push(text);
+        const headers = table.querySelectorAll('thead tr:first-child th');
+        console.log('Total headers found:', headers.length);
+        headers.forEach((th, index) => {
+            const headerText = th.textContent.trim();
+            console.log(`Header ${index}: "${headerText}"`);
+            // Skip Actions column only (index 1)
+            if (index !== 1) {
+                headerRow.push(headerText);
             }
         });
+        console.log('Headers to export:', headerRow.length, headerRow);
         data.push(headerRow);
 
-        // Get data
+        // Get data - Skip Actions column only (index 1)
+        let rowCount = 0;
         table.querySelectorAll('tbody tr').forEach(tr => {
             const row = [];
-            tr.querySelectorAll('td').forEach((td, index) => {
-                // Skip Operations column
-                if (index === 0 || index > 1) {
-                    row.push(td.textContent.trim().replace(/\s+/g, ' '));
+            const cells = tr.querySelectorAll('td');
+            if (rowCount === 0) {
+                console.log('First row - Total cells found:', cells.length);
+            }
+            cells.forEach((td, index) => {
+                // Skip Actions column only (index 1)
+                if (index !== 1) {
+                    let cellValue = '';
+
+                    // Check for special columns with attachments/images
+                    if (td.querySelector('.no-image') && td.querySelector('small')) {
+                        // Attachment column - extract meaningful text
+                        const smallText = td.querySelector('small').textContent.trim();
+                        cellValue = smallText.includes('No') ? 'N/A' : 'Available';
+                    } else if (td.querySelector('.badge')) {
+                        // Badge column - get all badges text
+                        const badges = td.querySelectorAll('.badge');
+                        cellValue = Array.from(badges).map(badge => {
+                            const text = badge.textContent.trim();
+                            // Remove star icon from text
+                            return text.replace(/★/g, '').trim();
+                        }).join(', ');
+                    } else if (td.classList.contains('project-description')) {
+                        // Description column
+                        const descDiv = td.querySelector('.text-wrap');
+                        cellValue = descDiv ? descDiv.textContent.trim() : td.textContent.trim();
+                    } else {
+                        // Regular column - get text content
+                        cellValue = td.textContent.trim();
+                    }
+
+                    // Clean up whitespace
+                    cellValue = cellValue.replace(/\s+/g, ' ').trim();
+                    row.push(cellValue);
                 }
             });
+            if (rowCount === 0) {
+                console.log('First row - Cells to export:', row.length, row);
+            }
             if (row.some(cell => cell !== '')) {
                 data.push(row);
             }
+            rowCount++;
         });
 
         // Create workbook
         const ws = XLSX.utils.aoa_to_sheet(data);
         const wb = XLSX.utils.book_new();
 
-        const pageTitle = document.querySelector('.card-title')?.textContent || 'Sheet1';
+        // Set column widths for better readability
+        const colWidths = [
+            { wch: 8 },  // #
+            { wch: 12 }, // PR Number
+            { wch: 25 }, // Project Name
+            { wch: 15 }, // Technologies
+            { wch: 20 }, // All Vendors
+            { wch: 20 }, // All DS
+            { wch: 20 }, // Customer
+            { wch: 15 }, // Customer PO
+            { wch: 12 }, // Value
+            { wch: 18 }, // AC Manager
+            { wch: 18 }, // Project Manager
+            { wch: 20 }, // Customer Contact
+            { wch: 12 }, // PO Attachment
+            { wch: 12 }, // EPO Attachment
+            { wch: 12 }, // PO Date
+            { wch: 12 }, // Duration
+            { wch: 12 }, // Deadline
+            { wch: 30 }  // Description
+        ];
+        ws['!cols'] = colWidths;
+
+        const pageTitle = document.querySelector('.card-title')?.textContent || 'Projects';
         XLSX.utils.book_append_sheet(wb, ws, pageTitle.substring(0, 31));
 
-        // Save
-        XLSX.writeFile(wb, pageTitle.replace(/\s+/g, '_') + '_' + new Date().getTime() + '.xlsx');
+        // Save with date
+        const fileName = 'Projects_' + new Date().toISOString().slice(0, 10) + '.xlsx';
+        XLSX.writeFile(wb, fileName);
 
         button.innerHTML = originalHTML;
         button.disabled = false;
