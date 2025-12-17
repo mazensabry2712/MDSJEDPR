@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test PPOS Category AJAX</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    <h1>Test PPOS Category Loading</h1>
+
+    <label>Select PR Number:</label>
+    <select id="pr_number">
+        <option value="">Choose...</option>
+        <option value="1">1</option>
+    </select>
+
+    <br><br>
+
+    <label>Categories:</label>
+    <select id="category">
+        <option value="">Select PR Number first</option>
+    </select>
+
+    <br><br>
+
+    <div id="log" style="background: #f0f0f0; padding: 10px; margin-top: 20px;">
+        <strong>Log:</strong><br>
+        <div id="log-content"></div>
+    </div>
+
+    <script>
+        function log(message) {
+            $('#log-content').append(message + '<br>');
+            console.log(message);
+        }
+
+        $(document).ready(function() {
+            log('✅ Document ready');
+
+            $('#pr_number').on('change', function() {
+                var prNumber = $(this).val();
+                log('🔵 PR Number selected: ' + prNumber);
+
+                if (prNumber) {
+                    loadCategories(prNumber);
+                } else {
+                    resetCategoryDropdown();
+                }
+            });
+
+            function loadCategories(prNumber) {
+                log('📡 Starting AJAX call for PR: ' + prNumber);
+
+                $('#category').prop('disabled', true);
+                $('#category').html('<option value="">Loading...</option>');
+
+                $.ajax({
+                    url: `/ppos/categories/${prNumber}`,
+                    type: 'GET',
+                    dataType: 'json',
+                    success: function(response) {
+                        log('✅ AJAX Success! Response: ' + JSON.stringify(response));
+
+                        if (response.success && response.categories.length > 0) {
+                            let options = '<option value="" selected disabled>Select Category</option>';
+
+                            response.categories.forEach(function(category) {
+                                options += `<option value="${category.id}">${category.category || 'N/A'}</option>`;
+                                log('  - Added category: ' + category.category);
+                            });
+
+                            $('#category').html(options);
+                            $('#category').prop('disabled', false);
+                            log(`✅ Loaded ${response.categories.length} categories`);
+                        } else {
+                            log('⚠️ No categories in response');
+                            resetCategoryDropdown();
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        log('❌ AJAX Error!');
+                        log('Status: ' + status);
+                        log('Error: ' + error);
+                        log('Response: ' + xhr.responseText);
+                        resetCategoryDropdown();
+                    }
+                });
+            }
+
+            function resetCategoryDropdown() {
+                $('#category').html('<option value="">No categories available</option>');
+                $('#category').prop('disabled', true);
+                log('🔄 Category dropdown reset');
+            }
+        });
+    </script>
+</body>
+</html>

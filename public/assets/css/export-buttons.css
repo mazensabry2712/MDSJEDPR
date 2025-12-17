@@ -1,0 +1,308 @@
+/*
+ * Export & Print Buttons Unified Styling
+ * MDSJEDPR - Corporate Sites Management System
+ * Version: 2.0 - Matching Project Status Style
+ */
+
+/* Simple button styling matching PStatus design */
+.btn-export-pdf,
+.btn-export-excel,
+.btn-export-csv,
+.btn-export-print {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    padding: 6px 12px;
+    border-radius: 4px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    border: none;
+}
+
+.btn-export-pdf i,
+.btn-export-excel i,
+.btn-export-csv i,
+.btn-export-print i {
+    font-size: 14px;
+}
+
+/* PDF Button - Red */
+.btn-export-pdf {
+    background-color: #dc3545;
+    color: #fff;
+}
+
+.btn-export-pdf:hover {
+    background-color: #c82333;
+    color: #fff;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 5px rgba(220, 53, 69, 0.3);
+}
+
+/* Excel Button - Green */
+.btn-export-excel {
+    background-color: #28a745;
+    color: #fff;
+}
+
+.btn-export-excel:hover {
+    background-color: #218838;
+    color: #fff;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 5px rgba(40, 167, 69, 0.3);
+}
+
+/* CSV Button - Info Blue */
+.btn-export-csv {
+    background-color: #17a2b8;
+    color: #fff;
+}
+
+.btn-export-csv:hover {
+    background-color: #138496;
+    color: #fff;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 5px rgba(23, 162, 184, 0.3);
+}
+
+/* Print Button - Secondary Gray */
+.btn-export-print {
+    background-color: #6c757d;
+    color: #fff;
+}
+
+.btn-export-print:hover {
+    background-color: #5a6268;
+    color: #fff;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 5px rgba(108, 117, 125, 0.3);
+}
+
+/* Loading State */
+.btn-export-pdf.loading,
+.btn-export-excel.loading,
+.btn-export-csv.loading,
+.btn-export-print.loading {
+    pointer-events: none;
+    opacity: 0.65;
+}
+
+.btn-export-pdf.loading i,
+.btn-export-excel.loading i,
+.btn-export-csv.loading i,
+.btn-export-print.loading i {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+/* Active/Focus States */
+.btn-export-pdf:active,
+.btn-export-excel:active,
+.btn-export-csv:active,
+.btn-export-print:active {
+    transform: translateY(0);
+}
+
+.btn-export-pdf:focus,
+.btn-export-excel:focus,
+.btn-export-csv:focus,
+.btn-export-print:focus {
+    outline: none;
+    box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+}
+
+/* Disabled State */
+.btn-export-pdf:disabled,
+.btn-export-excel:disabled,
+.btn-export-csv:disabled,
+.btn-export-print:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .btn-export-pdf,
+    .btn-export-excel,
+    .btn-export-csv,
+    .btn-export-print {
+        padding: 5px 10px;
+        font-size: 13px;
+    }
+}
+
+/* Print Styles - Hide buttons when printing */
+@media print {
+    .btn-export-pdf,
+    .btn-export-excel,
+    .btn-export-csv,
+    .btn-export-print {
+        display: none !important;
+    }
+}
+/* Loading State */
+.export-buttons .btn.loading {
+    pointer-events: none;
+    opacity: 0.7;
+}
+
+.export-buttons .btn.loading i {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Success State */
+.export-buttons .btn.success {
+    background: linear-gradient(135deg, #27ae60 0%, #229954 100%) !important;
+}
+
+.export-buttons .btn.success i::before {
+    content: "\f00c";
+}
+
+/* Error State */
+.export-buttons .btn.error {
+    background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%) !important;
+}
+
+/* Tooltip Enhancement */
+.export-buttons .btn[title]:hover::after {
+    content: attr(title);
+    position: absolute;
+    bottom: -35px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.9);
+    color: #fff;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    white-space: nowrap;
+    z-index: 1000;
+    pointer-events: none;
+    animation: fadeIn 0.2s ease;
+}
+
+.export-buttons .btn[title]:hover::before {
+    content: '';
+    position: absolute;
+    bottom: -8px;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 6px solid transparent;
+    border-bottom-color: rgba(0, 0, 0, 0.9);
+    z-index: 1001;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateX(-50%) translateY(-5px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+    }
+}
+
+/* Responsive Design */
+@media (min-width: 768px) {
+    .export-buttons .btn {
+        padding: 8px 18px;
+        min-width: 50px;
+    }
+
+    .export-buttons .btn .btn-text {
+        display: inline;
+        margin-left: 4px;
+    }
+}
+
+@media (max-width: 576px) {
+    .export-buttons-container {
+        gap: 4px;
+        margin-right: 8px;
+    }
+
+    .export-buttons {
+        border-radius: 6px;
+        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+    }
+
+    .export-buttons .btn {
+        padding: 6px 10px;
+        height: 36px;
+        min-width: 36px;
+    }
+
+    .export-buttons .btn i {
+        font-size: 14px;
+    }
+}
+
+/* Dark Mode Support */
+@media (prefers-color-scheme: dark) {
+    .export-buttons {
+        background: #2c3e50;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    }
+
+    .export-buttons .btn {
+        border-right-color: rgba(255, 255, 255, 0.1);
+    }
+}
+
+/* Print Styles */
+@media print {
+    .export-buttons-container,
+    .export-buttons {
+        display: none !important;
+    }
+}
+
+/* Accessibility */
+.export-buttons .btn:focus {
+    outline: 2px solid #3498db;
+    outline-offset: 2px;
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+}
+
+.export-buttons .btn:focus:not(:focus-visible) {
+    outline: none;
+    box-shadow: none;
+}
+
+/* Disabled State */
+.export-buttons .btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+/* Badge for notifications */
+.export-buttons .btn .badge {
+    position: absolute;
+    top: -6px;
+    right: -6px;
+    background: #e74c3c;
+    color: #fff;
+    font-size: 10px;
+    padding: 2px 5px;
+    border-radius: 10px;
+    font-weight: 600;
+}

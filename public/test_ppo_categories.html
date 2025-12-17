@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PPO Categories Test</title>
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+        select {
+            width: 100%;
+            padding: 8px;
+        }
+        .console-output {
+            background: #1e1e1e;
+            color: #00ff00;
+            padding: 15px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            max-height: 400px;
+            overflow-y: auto;
+            margin-top: 20px;
+        }
+        .console-output div {
+            margin: 2px 0;
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        .success { color: #00ff00; }
+        .error { color: #ff4444; }
+        .warning { color: #ffaa00; }
+        .info { color: #4488ff; }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🧪 PPO Categories Auto-Selection Test</h1>
+        
+        <div class="form-group">
+            <label>Project Number:</label>
+            <select id="pr_number" style="width: 100%">
+                <option value="">Choose Project</option>
+                <option value="1" data-project-name="Project Alpha">PR-001</option>
+                <option value="2" data-project-name="Project Beta">PR-002</option>
+                <option value="3" data-project-name="Project Gamma">PR-003</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>Project Name:</label>
+            <input type="text" id="project_name_display" readonly style="width: 100%; padding: 8px; background: #f0f0f0;">
+        </div>
+
+        <div class="form-group">
+            <label>Categories (Multiple):</label>
+            <select id="category" multiple style="width: 100%; height: 150px">
+                <option value="" disabled>Select PR Number first</option>
+            </select>
+        </div>
+
+        <div class="console-output" id="console"></div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    
+    <script>
+        // Mock console
+        const consoleDiv = $('#console');
+        function log(msg, type = 'info') {
+            const colors = {
+                success: '#00ff00',
+                error: '#ff4444',
+                warning: '#ffaa00',
+                info: '#4488ff'
+            };
+            consoleDiv.append(`<div style="color: ${colors[type]}">[${new Date().toLocaleTimeString()}] ${msg}</div>`);
+            consoleDiv.scrollTop(consoleDiv[0].scrollHeight);
+            console.log(msg);
+        }
+
+        $(document).ready(function() {
+            log('✅ Page loaded', 'success');
+            log('jQuery version: ' + $.fn.jquery, 'info');
+            log('Select2 available: ' + (typeof $.fn.select2 !== 'undefined'), 'info');
+
+            // Initialize Select2
+            $('#pr_number').select2({
+                placeholder: "Choose Project",
+                allowClear: true,
+                width: '100%'
+            });
+
+            $('#category').select2({
+                placeholder: "Select PR Number first",
+                allowClear: true,
+                closeOnSelect: false,
+                width: '100%'
+            });
+
+            log('✅ Select2 initialized', 'success');
+
+            // Mock categories data (simulating AJAX response)
+            const mockCategories = {
+                1: [
+                    {id: 1, category: 'Category A'},
+                    {id: 2, category: 'Category B'},
+                    {id: 3, category: 'Category C'}
+                ],
+                2: [
+                    {id: 4, category: 'Category X'},
+                    {id: 5, category: 'Category Y'}
+                ],
+                3: [
+                    {id: 6, category: 'Category Z'}
+                ]
+            };
+
+            // Change event
+            $('#pr_number').on('change', function() {
+                log('🔔 PR Number changed!', 'warning');
+
+                const selectedOption = $(this).find('option:selected');
+                const projectName = selectedOption.data('project-name');
+                const prNumber = $(this).val();
+
+                log('Selected PR Number ID: ' + prNumber, 'info');
+                log('Project Name: ' + projectName, 'info');
+
+                // Fill Project Name
+                if (projectName) {
+                    $('#project_name_display').val(projectName);
+                    log('✅ Project name filled', 'success');
+                }
+
+                // Load Categories
+                if (prNumber) {
+                    loadCategories(prNumber);
+                } else {
+                    resetCategoryDropdown();
+                }
+            });
+
+            function loadCategories(prNumber) {
+                log('📡 Loading categories for Project ID: ' + prNumber, 'info');
+
+                $('#category').prop('disabled', true);
+
+                // Destroy existing Select2
+                if ($('#category').data('select2')) {
+                    $('#category').select2('destroy');
+                    log('🔄 Select2 destroyed', 'info');
+                }
+
+                $('#category').html('<option disabled selected>Loading...</option>');
+
+                // Simulate AJAX delay
+                setTimeout(function() {
+                    const categories = mockCategories[prNumber] || [];
+                    
+                    log('✅ AJAX Response received', 'success');
+                    log('Found ' + categories.length + ' categories', 'info');
+
+                    if (categories.length > 0) {
+                        let options = '';
+                        let categoryIds = [];
+
+                        categories.forEach(function(category) {
+                            options += `<option value="${category.id}">${category.category}</option>`;
+                            categoryIds.push(category.id);
+                            log('  ➕ Category ID: ' + category.id + ' - ' + category.category, 'info');
+                        });
+
+                        $('#category').html(options);
+                        $('#category').prop('disabled', false);
+
+                        // Re-initialize Select2
+                        $('#category').select2({
+                            placeholder: 'Categories loaded',
+                            allowClear: true,
+                            closeOnSelect: false,
+                            width: '100%'
+                        });
+                        log('✅ Select2 re-initialized', 'success');
+
+                        // Auto-select ALL categories
+                        log('📌 Auto-selecting category IDs: [' + categoryIds.join(', ') + ']', 'warning');
+                        $('#category').val(categoryIds).trigger('change');
+                        
+                        // Verify selection
+                        const selectedValues = $('#category').val();
+                        log('✅ Selected values after trigger: [' + (selectedValues ? selectedValues.join(', ') : 'NONE') + ']', 
+                            selectedValues && selectedValues.length > 0 ? 'success' : 'error');
+                        
+                        log('✅ Loaded and auto-selected ' + categories.length + ' categories', 'success');
+                    } else {
+                        log('⚠️ No categories found', 'warning');
+                        resetCategoryDropdown();
+                    }
+                }, 500);
+            }
+
+            function resetCategoryDropdown() {
+                log('🔄 Resetting category dropdown', 'info');
+
+                if ($('#category').data('select2')) {
+                    $('#category').select2('destroy');
+                }
+
+                $('#category').html('<option value="">No categories available</option>');
+                $('#category').prop('disabled', true);
+
+                $('#category').select2({
+                    placeholder: 'No categories available',
+                    allowClear: false
+                });
+                log('✅ Dropdown reset complete', 'success');
+            }
+
+            log('📝 Script initialization complete. Select a PR Number to test.', 'success');
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,229 @@
+<!--
+    Export Buttons Component - Usage Guide
+    MDSJEDPR - Corporate Sites Management System
+
+    HOW TO USE:
+    ===========
+
+    1. Include CSS file in your page <head>:
+       <link href="{{ URL::asset('assets/css/export-buttons.css') }}" rel="stylesheet">
+
+    2. Include JS file before closing </body>:
+       <script src="{{ URL::asset('assets/js/export-functions.js') }}"></script>
+
+    3. Add the export buttons HTML to your page (usually in the card header):
+       Copy the HTML structure below
+
+    4. Call the export functions with your specific parameters
+-->
+
+<!-- EXAMPLE 1: Standard Export Buttons (Icon Only) -->
+<div class="btn-group export-buttons mr-2" role="group" aria-label="Export Options">
+    <button type="button"
+            class="btn btn-pdf"
+            onclick="exportTableToPDF('example1', 'Data Export', [0, 5])"
+            title="تصدير إلى PDF"
+            aria-label="Export to PDF">
+        <i class="fas fa-file-pdf"></i>
+    </button>
+    <button type="button"
+            class="btn btn-excel"
+            onclick="exportTableToExcel('example1', 'Data Export', [0, 5])"
+            title="تصدير إلى Excel"
+            aria-label="Export to Excel">
+        <i class="fas fa-file-excel"></i>
+    </button>
+    <button type="button"
+            class="btn btn-csv"
+            onclick="exportTableToCSV('example1', 'Data Export', [0, 5])"
+            title="تصدير إلى CSV"
+            aria-label="Export to CSV">
+        <i class="fas fa-file-csv"></i>
+    </button>
+    <button type="button"
+            class="btn btn-print"
+            onclick="printTableData('example1', 'Data Report')"
+            title="طباعة"
+            aria-label="Print">
+        <i class="fas fa-print"></i>
+    </button>
+</div>
+
+<!-- EXAMPLE 2: Export Buttons with Text Labels (Desktop) -->
+<div class="btn-group export-buttons mr-2" role="group" aria-label="Export Options">
+    <button type="button"
+            class="btn btn-pdf"
+            onclick="exportTableToPDF('myTable', 'My Report', [])"
+            title="تصدير إلى PDF">
+        <i class="fas fa-file-pdf"></i>
+        <span class="btn-text">PDF</span>
+    </button>
+    <button type="button"
+            class="btn btn-excel"
+            onclick="exportTableToExcel('myTable', 'My Report', [])"
+            title="تصدير إلى Excel">
+        <i class="fas fa-file-excel"></i>
+        <span class="btn-text">Excel</span>
+    </button>
+    <button type="button"
+            class="btn btn-csv"
+            onclick="exportTableToCSV('myTable', 'My Report', [])"
+            title="تصدير إلى CSV">
+        <i class="fas fa-file-csv"></i>
+        <span class="btn-text">CSV</span>
+    </button>
+    <button type="button"
+            class="btn btn-print"
+            onclick="printTableData('myTable', 'My Report')"
+            title="طباعة">
+        <i class="fas fa-print"></i>
+        <span class="btn-text">Print</span>
+    </button>
+</div>
+
+<!-- EXAMPLE 3: Complete Integration in Card Header -->
+<div class="card">
+    <div class="card-header pb-0">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h6 class="card-title mb-0">Data Management</h6>
+            </div>
+            <div class="d-flex align-items-center">
+                <!-- Export Buttons -->
+                <div class="btn-group export-buttons mr-2" role="group">
+                    <button type="button"
+                            class="btn btn-pdf"
+                            onclick="exportTableToPDF('dataTable', 'Data Report', [0, 6])"
+                            title="تصدير إلى PDF">
+                        <i class="fas fa-file-pdf"></i>
+                    </button>
+                    <button type="button"
+                            class="btn btn-excel"
+                            onclick="exportTableToExcel('dataTable', 'Data Report', [0, 6])"
+                            title="تصدير إلى Excel">
+                        <i class="fas fa-file-excel"></i>
+                    </button>
+                    <button type="button"
+                            class="btn btn-csv"
+                            onclick="exportTableToCSV('dataTable', 'Data Report', [0, 6])"
+                            title="تصدير إلى CSV">
+                        <i class="fas fa-file-csv"></i>
+                    </button>
+                    <button type="button"
+                            class="btn btn-print"
+                            onclick="printTableData('dataTable', 'Data Report')"
+                            title="طباعة">
+                        <i class="fas fa-print"></i>
+                    </button>
+                </div>
+
+                <!-- Add Button (if needed) -->
+                @can('Add')
+                    <a class="btn btn-primary" href="#" data-toggle="modal" data-target="#addModal">
+                        <i class="fas fa-plus"></i> Add New
+                    </a>
+                @endcan
+            </div>
+        </div>
+    </div>
+    <div class="card-body">
+        <table id="dataTable" class="table">
+            <!-- Your table content here -->
+        </table>
+    </div>
+</div>
+
+<!--
+    FUNCTION PARAMETERS EXPLAINED:
+    ==============================
+
+    exportTableToPDF(tableId, title, excludeColumns, fileName)
+    - tableId: ID of the table to export (required)
+    - title: Title for the PDF document (required)
+    - excludeColumns: Array of column indices to exclude [0, 5, 6] (optional, default: [])
+    - fileName: Custom file name (optional, auto-generated if not provided)
+
+    exportTableToExcel(tableId, title, excludeColumns, fileName)
+    - Same parameters as PDF
+
+    exportTableToCSV(tableId, title, excludeColumns, fileName)
+    - Same parameters as PDF
+
+    printTableData(tableId, title)
+    - tableId: ID of the table to print (required)
+    - title: Title for the print document (required)
+
+    EXAMPLE USAGE WITH DIFFERENT PARAMETERS:
+    ========================================
+
+    // Export all columns
+    exportTableToPDF('myTable', 'Full Report', [])
+
+    // Exclude first column (index 0) and last column (index 5)
+    exportTableToPDF('myTable', 'Filtered Report', [0, 5])
+
+    // Custom file name
+    exportTableToPDF('myTable', 'Report', [], 'custom_report_2024.pdf')
+
+    // Print with custom title
+    printTableData('myTable', 'Monthly Sales Report')
+-->
+
+<!--
+    COMMON TABLE IDS IN THE PROJECT:
+    ================================
+    - example1: Most common DataTable ID
+    - dataTable: Generic table ID
+    - vendorsTable: Vendors module
+    - customersTable: Customers module
+    - projectsTable: Projects module
+
+    COLUMN INDICES TO TYPICALLY EXCLUDE:
+    ====================================
+    - Column 0: Usually checkbox or row number
+    - Last column: Usually action buttons (Edit/Delete)
+
+    Example for a table with 7 columns where first and last should be excluded:
+    exportTableToPDF('example1', 'Report', [0, 6])
+-->
+
+<!--
+    STYLING CUSTOMIZATION:
+    ======================
+
+    You can override styles in your page CSS:
+
+    <style>
+        /* Change button colors */
+        .export-buttons .btn-pdf {
+            background: linear-gradient(135deg, #your-color 0%, #your-color-dark 100%);
+        }
+
+        /* Change button size */
+        .export-buttons .btn {
+            padding: 10px 20px;
+            height: 45px;
+        }
+
+        /* Change hover effect */
+        .export-buttons .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+        }
+    </style>
+-->
+
+<!--
+    ACCESSIBILITY FEATURES:
+    =======================
+
+    The buttons include:
+    - ARIA labels for screen readers
+    - Keyboard navigation support (Tab key)
+    - Focus indicators
+    - Tooltips with translations
+    - Loading states with visual feedback
+    - Success/Error indicators
+
+    All features are built-in and work automatically!
+-->

@@ -1,0 +1,21 @@
+﻿Title Updates Summary - All pages now follow the pattern: Page Name | MDSJEDPR
+
+Updated Pages:
+- Login | MDSJEDPR
+- Milestones | MDSJEDPR
+- Certificate of Compliance | MDSJEDPR
+- DN | MDSJEDPR
+- Customers | MDSJEDPR
+- Vendors | MDSJEDPR
+- PMs | MDSJEDPR
+- AMs | MDSJEDPR
+- Disti/ Supplier | MDSJEDPR
+- Invoices | MDSJEDPR
+- PPOs Management | MDSJEDPR
+- Risks | MDSJEDPR
+- Project Status | MDSJEDPR
+- Project Tasks | MDSJEDPR
+- Project EPO | MDSJEDPR
+- Users | MDSJEDPR
+- User Permissions | MDSJEDPR
+- Reports | MDSJEDPR

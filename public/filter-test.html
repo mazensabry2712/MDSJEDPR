@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Filter Persistence Test</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mt-5">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h4><i class="fas fa-filter"></i> Filter Persistence Demonstration</h4>
+            </div>
+            <div class="card-body">
+                <h5>Scenario 1: No Filters Applied</h5>
+                <div class="alert alert-info">
+                    <strong>URL:</strong> <code>http://mdsjedpr.test/reports</code><br>
+                    <strong>Active Filters Badge:</strong> Hidden (0 filters)<br>
+                    <strong>Form State:</strong> All fields empty/default
+                </div>
+
+                <hr>
+
+                <h5>Scenario 2: Single Filter (PR Number = "1")</h5>
+                <div class="alert alert-success">
+                    <strong>URL:</strong> <code>http://mdsjedpr.test/reports?filter[pr_number]=1</code><br>
+                    <strong>Active Filters Badge:</strong> <span class="badge badge-primary">1 Active</span><br>
+                    <strong>Selected in Form:</strong>
+                    <ul>
+                        <li>PR Number dropdown: <strong>"1"</strong> selected ✅</li>
+                        <li>Active Filters Summary shows: <span class="badge badge-primary">Pr number: <strong>1</strong></span></li>
+                    </ul>
+                    <strong>Results:</strong> 1 project (PR-1: mazen sabryde)
+                </div>
+
+                <hr>
+
+                <h5>Scenario 3: Multiple Filters</h5>
+                <div class="alert alert-warning">
+                    <strong>URL:</strong> <code>http://mdsjedpr.test/reports?filter[pr_number]=11&filter[technologies]=يشسي&filter[value_min]=1000</code><br>
+                    <strong>Active Filters Badge:</strong> <span class="badge badge-primary">3 Active</span><br>
+                    <strong>Selected in Form:</strong>
+                    <ul>
+                        <li>PR Number: <strong>"11"</strong> selected ✅</li>
+                        <li>Technologies: <strong>"يشسيشسي"</strong> selected ✅</li>
+                        <li>Value Min: <strong>"1000"</strong> filled ✅</li>
+                    </ul>
+                    <strong>Active Filters Summary shows:</strong>
+                    <ul>
+                        <li><span class="badge badge-primary">Pr number: <strong>11</strong></span></li>
+                        <li><span class="badge badge-primary">Technologies: <strong>يشسي</strong></span></li>
+                        <li><span class="badge badge-primary">Value min: <strong>1000</strong></span></li>
+                    </ul>
+                </div>
+
+                <hr>
+
+                <h5>How It Works:</h5>
+                <div class="card">
+                    <div class="card-body">
+                        <h6>1. In Select Dropdowns (e.g., PR Number, Project Name):</h6>
+                        <pre><code>&lt;select name="filter[pr_number]"&gt;
+    &lt;option&gt;&lt;/option&gt;
+    @foreach($prNumbers as $prNumber)
+        &lt;option value="{{ $prNumber }}" <span class="text-success">{{ request('filter.pr_number') == $prNumber ? 'selected' : '' }}</span>&gt;
+            {{ $prNumber }}
+        &lt;/option&gt;
+    @endforeach
+&lt;/select&gt;</code></pre>
+
+                        <h6>2. In Text/Number Inputs (e.g., Value Min, Deadline):</h6>
+                        <pre><code>&lt;input type="number"
+       name="filter[value_min]"
+       <span class="text-success">value="{{ request('filter.value_min') }}"</span>&gt;</code></pre>
+
+                        <h6>3. Active Filters Counter:</h6>
+                        <pre><code>@if(request()-&gt;has('filter'))
+    &lt;span class="active-filters-badge"&gt;
+        <span class="text-success">{{ count(array_filter(request('filter', []))) }}</span> Active
+    &lt;/span&gt;
+@endif</code></pre>
+
+                        <h6>4. Active Filters Summary (NEW):</h6>
+                        <pre><code>@foreach(request('filter', []) as $filterKey =&gt; $filterValue)
+    @if(!empty($filterValue))
+        &lt;span class="badge badge-primary"&gt;
+            {{ ucfirst(str_replace('_', ' ', $filterKey)) }}:
+            &lt;strong&gt;{{ $filterValue }}&lt;/strong&gt;
+        &lt;/span&gt;
+    @endif
+@endforeach</code></pre>
+                    </div>
+                </div>
+
+                <hr>
+
+                <div class="alert alert-success">
+                    <h5><i class="fas fa-check-circle"></i> All Filters Have Persistence!</h5>
+                    <ul>
+                        <li>✅ PR Number (select)</li>
+                        <li>✅ Project Name (select)</li>
+                        <li>✅ Technologies (select)</li>
+                        <li>✅ Project Manager (select)</li>
+                        <li>✅ Customer Name (select)</li>
+                        <li>✅ Customer PO (select)</li>
+                        <li>✅ Vendors (select)</li>
+                        <li>✅ Suppliers (select)</li>
+                        <li>✅ Account Manager (select)</li>
+                        <li>✅ Value Min/Max (number inputs)</li>
+                        <li>✅ Deadline From/To (date inputs)</li>
+                    </ul>
+                </div>
+
+                <div class="text-center mt-4">
+                    <a href="http://mdsjedpr.test/reports?filter[pr_number]=1" class="btn btn-primary" target="_blank">
+                        <i class="fas fa-external-link-alt"></i> Test in Browser: Filter by PR=1
+                    </a>
+                    <a href="http://mdsjedpr.test/reports?filter[pr_number]=11&filter[technologies]=يشسي" class="btn btn-success ml-2" target="_blank">
+                        <i class="fas fa-external-link-alt"></i> Test: Multiple Filters
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

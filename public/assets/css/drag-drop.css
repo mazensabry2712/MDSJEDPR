@@ -1,0 +1,107 @@
+/* Custom Drag and Drop Styles for File Upload */
+
+.drag-drop-area {
+    border: 3px dashed #dee2e6;
+    border-radius: 12px;
+    padding: 40px 20px;
+    text-align: center;
+    background-color: #f8f9fa;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    position: relative;
+    min-height: 200px;
+}
+
+.drag-drop-area:hover {
+    border-color: #007bff;
+    background-color: #e7f3ff;
+}
+
+.drag-drop-area.dragover {
+    border-color: #28a745;
+    background-color: #d4edda;
+    transform: scale(1.02);
+}
+
+.drag-drop-content {
+    pointer-events: auto;
+}
+
+.drag-drop-icon {
+    margin-bottom: 20px;
+}
+
+.drag-drop-title {
+    color: #495057;
+    margin-bottom: 10px;
+    font-size: 1.5rem;
+}
+
+.drag-drop-subtitle {
+    color: #6c757d;
+    margin-bottom: 15px;
+}
+
+.browse-link {
+    color: #007bff;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+.file-preview {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #fff;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.preview-content {
+    text-align: center;
+    max-width: 90%;
+}
+
+.preview-image {
+    max-width: 150px;
+    max-height: 150px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    margin-bottom: 15px;
+}
+
+.preview-info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+}
+
+.file-name {
+    font-weight: bold;
+    color: #495057;
+}
+
+.file-size {
+    color: #6c757d;
+    font-size: 0.9rem;
+}
+
+.remove-file {
+    margin-top: 10px;
+}
+
+/* Animation for drag and drop */
+@keyframes dragPulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+.drag-drop-area.dragover {
+    animation: dragPulse 0.5s ease-in-out;
+}
