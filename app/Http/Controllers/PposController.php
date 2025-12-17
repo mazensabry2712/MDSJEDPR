@@ -6,12 +6,28 @@ use App\Models\Ppos;
 use App\Models\Project;
 use App\Models\Pepo;
 use App\Models\Ds;
+use App\Exports\PposExport;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Cache;
+use Maatwebsite\Excel\Facades\Excel;
+use Illuminate\Support\Facades\Log;
 
 class PposController extends Controller
 {
+    /**
+     * Export PPOs to Excel
+     */
+    public function exportExcel()
+    {
+        try {
+            return Excel::download(new PposExport, 'PPOs_' . date('Y-m-d_H-i-s') . '.xlsx');
+        } catch (\Exception $e) {
+            Log::error('PPOs Excel Export Error: ' . $e->getMessage());
+            return redirect()->back()->with('Error', 'Failed to export PPOs to Excel');
+        }
+    }
+
     /**
      * Display a listing of the resource.
      */

@@ -190,4 +190,20 @@ class DsController extends Controller
         $ds = Ds::select('id', 'dsname', 'ds_contact')->get();
         return view('dashboard.ds.print', compact('ds'));
     }
+
+    /**
+     * Export DS to Excel
+     */
+    public function exportExcel()
+    {
+        try {
+            return \Maatwebsite\Excel\Facades\Excel::download(
+                new \App\Exports\DsExport,
+                'Delivery_Specialists_' . date('Y-m-d') . '.xlsx'
+            );
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('DS Excel Export Error: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Failed to export DS data to Excel.');
+        }
+    }
 }

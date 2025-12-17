@@ -259,4 +259,20 @@ class DnController extends Controller
         $dn = Dn::with('project:id,pr_number,name')->get();
         return view('dashboard.dn.print', compact('dn'));
     }
+
+    /**
+     * Export DN to Excel
+     */
+    public function exportExcel()
+    {
+        try {
+            return \Maatwebsite\Excel\Facades\Excel::download(
+                new \App\Exports\DnExport,
+                'Delivery_Notes_' . date('Y-m-d') . '.xlsx'
+            );
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('DN Excel Export Error: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Failed to export DN data to Excel.');
+        }
+    }
 }

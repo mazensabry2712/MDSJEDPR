@@ -342,4 +342,18 @@ return redirect('/customer'); //حسب الحاجة
             return redirect()->back()->with('error', 'Error loading print view: ' . $e->getMessage());
         }
     }
+
+    /**
+     * Export Customers to Excel using Maatwebsite/Laravel-Excel
+     */
+    public function exportExcel()
+    {
+        try {
+            $fileName = 'Customers_' . date('Y-m-d') . '.xlsx';
+            return \Maatwebsite\Excel\Facades\Excel::download(new \App\Exports\CustomersExport, $fileName);
+        } catch (Exception $e) {
+            Log::error('Customers Excel export error: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Error exporting Excel: ' . $e->getMessage());
+        }
+    }
 }

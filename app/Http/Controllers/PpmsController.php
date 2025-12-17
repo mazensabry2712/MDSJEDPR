@@ -3,11 +3,27 @@
 namespace App\Http\Controllers;
 
 use App\Models\ppms;
+use App\Exports\PpmsExport;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
+use Maatwebsite\Excel\Facades\Excel;
+use Illuminate\Support\Facades\Log;
 
 class PpmsController extends Controller
 {
+    /**
+     * Export PMs to Excel
+     */
+    public function exportExcel()
+    {
+        try {
+            return Excel::download(new PpmsExport, 'PMs_' . date('Y-m-d_H-i-s') . '.xlsx');
+        } catch (\Exception $e) {
+            Log::error('PMs Excel Export Error: ' . $e->getMessage());
+            return redirect()->back()->with('Error', 'Failed to export PMs to Excel');
+        }
+    }
+
     /**
      * Display a listing of the resource.
      */

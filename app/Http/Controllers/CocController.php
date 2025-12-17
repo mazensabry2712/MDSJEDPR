@@ -231,4 +231,20 @@ class CocController extends Controller
         $coc = Coc::with('project:id,pr_number,name')->get();
         return view('dashboard.coc.print', compact('coc'));
     }
+
+    /**
+     * Export CoC to Excel
+     */
+    public function exportExcel()
+    {
+        try {
+            return \Maatwebsite\Excel\Facades\Excel::download(
+                new \App\Exports\CocExport,
+                'Certificate_of_Compliance_' . date('Y-m-d') . '.xlsx'
+            );
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('CoC Excel Export Error: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Failed to export CoC data to Excel.');
+        }
+    }
 }

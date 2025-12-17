@@ -70,39 +70,48 @@ Route::group(
         /*Customer*/
         // Customer PDF Export & Print (must be before resource route)
         Route::get('customer/export/pdf', [CustController::class, 'exportPDF'])->name('customer.export.pdf');
+        Route::get('customer/export/excel', [CustController::class, 'exportExcel'])->name('customer.export.excel');
         Route::get('customer/print', [CustController::class, 'printView'])->name('customer.print');
         Route::resource('customer', CustController::class);
 
         /*AM*/
         Route::get('am/export/pdf', [AamsController::class, 'exportPDF'])->name('am.export.pdf');
+        Route::get('am/export/excel', [AamsController::class, 'exportExcel'])->name('am.export.excel');
         Route::get('am/print', [AamsController::class, 'printView'])->name('am.print');
         Route::resource('am', AamsController::class);
         /*PM*/
         Route::get('pm/export/pdf', [PpmsController::class, 'exportPDF'])->name('pm.export.pdf');
+        Route::get('pm/export/excel', [PpmsController::class, 'exportExcel'])->name('pm.export.excel');
         Route::get('pm/print', [PpmsController::class, 'printView'])->name('pm.print');
         Route::resource('pm', PpmsController::class);
         /*Vendors */
         Route::get('vendors/export/pdf', [VendorsController::class, 'exportPDF'])->name('vendors.export.pdf');
+        Route::get('vendors/export/excel', [VendorsController::class, 'exportExcel'])->name('vendors.export.excel');
         Route::get('vendors/print', [VendorsController::class, 'printView'])->name('vendors.print');
         Route::resource('vendors', VendorsController::class);
         /*d/s */
         Route::get('ds/export/pdf', [DsController::class, 'exportPDF'])->name('ds.export.pdf');
+        Route::get('ds/export/excel', [DsController::class, 'exportExcel'])->name('ds.export.excel');
         Route::get('ds/print', [DsController::class, 'printView'])->name('ds.print');
         Route::resource('ds', DsController::class);
         // invoice
         Route::get('invoices/export/pdf', [InvoicesController::class, 'exportPDF'])->name('invoices.export.pdf');
+        Route::get('invoices/export/excel', [InvoicesController::class, 'exportExcel'])->name('invoices.export.excel');
         Route::get('invoices/print', [InvoicesController::class, 'printView'])->name('invoices.print');
         Route::resource('invoices', InvoicesController::class);
         // /*DN  */
         Route::get('dn/export/pdf', [DnController::class, 'exportPDF'])->name('dn.export.pdf');
+        Route::get('dn/export/excel', [DnController::class, 'exportExcel'])->name('dn.export.excel');
         Route::get('dn/print', [DnController::class, 'printView'])->name('dn.print');
         Route::resource('dn', DnController::class);
         //         /*CoC */
         Route::get('coc/export/pdf', [CocController::class, 'exportPDF'])->name('coc.export.pdf');
+        Route::get('coc/export/excel', [CocController::class, 'exportExcel'])->name('coc.export.excel');
         Route::get('coc/print', [CocController::class, 'printView'])->name('coc.print');
         Route::resource('coc', CocController::class);
         // /*Project POs Form */
         Route::get('ppos/export/pdf', [PposController::class, 'exportPDF'])->name('ppos.export.pdf');
+        Route::get('ppos/export/excel', [PposController::class, 'exportExcel'])->name('ppos.export.excel');
         Route::get('ppos/print', [PposController::class, 'printView'])->name('ppos.print');
         Route::resource('ppos', PposController::class);
         Route::delete('ppos/destroy', [PposController::class, 'destroy']);
@@ -110,27 +119,32 @@ Route::group(
 
         // /*Project Status  */
         Route::get('pstatus/export/pdf', [PstatusController::class, 'exportPDF'])->name('pstatus.export.pdf');
+        Route::get('pstatus/export/excel', [PstatusController::class, 'exportExcel'])->name('pstatus.export.excel');
         Route::get('pstatus/print', [PstatusController::class, 'printView'])->name('pstatus.print');
         Route::resource('pstatus', PstatusController::class);
         Route::delete('pstatus/destroy', [PstatusController::class, 'destroy']);
         // /*Project Tasks */
         Route::get('ptasks/export/pdf', [PtasksController::class, 'exportPDF'])->name('ptasks.export.pdf');
+        Route::get('ptasks/export/excel', [PtasksController::class, 'exportExcel'])->name('ptasks.export.excel');
         Route::get('ptasks/print', [PtasksController::class, 'printView'])->name('ptasks.print');
         Route::resource('ptasks', PtasksController::class);
         Route::delete('ptasks/destroy', [PtasksController::class, 'destroy']);
         // /*Project EPO */
         Route::get('epo/export/pdf', [PepoController::class, 'exportPDF'])->name('epo.export.pdf');
+        Route::get('epo/export/excel', [PepoController::class, 'exportExcel'])->name('epo.export.excel');
         Route::get('epo/print', [PepoController::class, 'printView'])->name('epo.print');
         Route::resource('epo', PepoController::class);
 
         // /*Risks  */
         Route::get('risks/export/pdf', [RisksController::class, 'exportPDF'])->name('risks.export.pdf');
+        Route::get('risks/export/excel', [RisksController::class, 'exportExcel'])->name('risks.export.excel');
         Route::get('risks/print', [RisksController::class, 'printView'])->name('risks.print');
         Route::resource('risks', RisksController::class);
         Route::delete('risks/destroy', [RisksController::class, 'destroy']);
 
         // /*Milestones  */
         Route::get('milestones/export/pdf', [MilestonesController::class, 'exportPDF'])->name('milestones.export.pdf');
+        Route::get('milestones/export/excel', [MilestonesController::class, 'exportExcel'])->name('milestones.export.excel');
         Route::get('milestones/print', [MilestonesController::class, 'printView'])->name('milestones.print');
         Route::resource('milestones', MilestonesController::class);
 
@@ -140,10 +154,15 @@ Route::group(
         Route::resource('users', UserController::class);
         Route::resource('reports', ReportController::class);
         Route::get('reports/customer/projects', [ReportController::class, 'getCustomerProjects'])->name('reports.customer.projects');
+        Route::post('reports/export/customer-projects', [ReportController::class, 'exportCustomerProjects'])->name('reports.export.customer.projects');
         Route::get('reports/vendor/projects', [ReportController::class, 'getVendorProjects'])->name('reports.vendor.projects');
+        Route::post('reports/export/vendor-projects', [ReportController::class, 'exportVendorProjects'])->name('reports.export.vendor.projects');
         Route::get('reports/supplier/projects', [ReportController::class, 'getSupplierProjects'])->name('reports.supplier.projects');
+        Route::post('reports/export/supplier-projects', [ReportController::class, 'exportSupplierProjects'])->name('reports.export.supplier.projects');
         Route::get('reports/pm/projects', [ReportController::class, 'getPMProjects'])->name('reports.pm.projects');
+        Route::post('reports/export/pm-projects', [ReportController::class, 'exportPmProjects'])->name('reports.export.pm.projects');
         Route::get('reports/am/projects', [ReportController::class, 'getAMProjects'])->name('reports.am.projects');
+        Route::post('reports/export/am-projects', [ReportController::class, 'exportAmProjects'])->name('reports.export.am.projects');
         Route::get('reports/export/csv', [ReportController::class, 'export'])->name('reports.export');
         Route::post('reports/cache/clear', [ReportController::class, 'clearCache'])->name('reports.cache.clear');
     }

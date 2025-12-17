@@ -9,12 +9,18 @@ use App\Models\aams;
 use App\Models\vendors;
 use App\Models\Ds;
 use App\Models\Cust;
+use App\Exports\CustomerProjectsExport;
+use App\Exports\VendorProjectsExport;
+use App\Exports\SupplierProjectsExport;
+use App\Exports\PmProjectsExport;
+use App\Exports\AmProjectsExport;
 use App\Http\Requests\ReportFilterRequest;
 use App\Services\ReportService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Maatwebsite\Excel\Facades\Excel;
 use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\QueryBuilder\AllowedFilter;
 
@@ -56,7 +62,36 @@ class ReportController extends Controller
         }
     }
 
+    /**
+     * Export customer projects to Excel
+     */
+    public function exportCustomerProjects(Request $request)
+    {
+        try {
+            // Get projects data - it comes as JSON string
+            $projectsJson = $request->input('projects', '[]');
+            $data = is_array($projectsJson) ? $projectsJson : json_decode($projectsJson, true);
 
+            $customerName = $request->input('customer_name', 'Customer');
+
+            if (empty($data) || !is_array($data)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'No data to export'
+                ], 400);
+            }
+
+            $fileName = 'Customer_Projects_' . str_replace(' ', '_', $customerName) . '_' . date('Y-m-d_H-i-s') . '.xlsx';
+
+            return Excel::download(new CustomerProjectsExport($data, $customerName), $fileName);
+        } catch (\Exception $e) {
+            Log::error('Customer Projects Excel Export Error: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to export projects to Excel'
+            ], 500);
+        }
+    }
 
     /**
      * Get customer projects via AJAX
@@ -586,5 +621,93 @@ class ReportController extends Controller
         $report->delete();
         session()->flash('delete', 'Report deleted successfully');
         return redirect()->route('reports.index');
+    }
+
+    /**
+     * Export vendor projects to Excel
+     */
+    public function exportVendorProjects(Request $request)
+    {
+        try {
+            $projectsJson = $request->input('projects', '[]');
+            $data = is_array($projectsJson) ? $projectsJson : json_decode($projectsJson, true);
+            $vendorName = $request->input('vendor_name', 'Vendor');
+
+            if (empty($data) || !is_array($data)) {
+                return response()->json(['success' => false, 'message' => 'No data to export'], 400);
+            }
+
+            $fileName = 'Vendor_Projects_' . str_replace(' ', '_', $vendorName) . '_' . date('Y-m-d_H-i-s') . '.xlsx';
+            return Excel::download(new VendorProjectsExport($data, $vendorName), $fileName);
+        } catch (\Exception $e) {
+            Log::error('Vendor Projects Excel Export Error: ' . $e->getMessage());
+            return response()->json(['success' => false, 'message' => 'Failed to export'], 500);
+        }
+    }
+
+    /**
+     * Export supplier projects to Excel
+     */
+    public function exportSupplierProjects(Request $request)
+    {
+        try {
+            $projectsJson = $request->input('projects', '[]');
+            $data = is_array($projectsJson) ? $projectsJson : json_decode($projectsJson, true);
+            $supplierName = $request->input('supplier_name', 'Supplier');
+
+            if (empty($data) || !is_array($data)) {
+                return response()->json(['success' => false, 'message' => 'No data to export'], 400);
+            }
+
+            $fileName = 'Supplier_Projects_' . str_replace(' ', '_', $supplierName) . '_' . date('Y-m-d_H-i-s') . '.xlsx';
+            return Excel::download(new SupplierProjectsExport($data, $supplierName), $fileName);
+        } catch (\Exception $e) {
+            Log::error('Supplier Projects Excel Export Error: ' . $e->getMessage());
+            return response()->json(['success' => false, 'message' => 'Failed to export'], 500);
+        }
+    }
+
+    /**
+     * Export PM projects to Excel
+     */
+    public function exportPmProjects(Request $request)
+    {
+        try {
+            $projectsJson = $request->input('projects', '[]');
+            $data = is_array($projectsJson) ? $projectsJson : json_decode($projectsJson, true);
+            $pmName = $request->input('pm_name', 'PM');
+
+            if (empty($data) || !is_array($data)) {
+                return response()->json(['success' => false, 'message' => 'No data to export'], 400);
+            }
+
+            $fileName = 'PM_Projects_' . str_replace(' ', '_', $pmName) . '_' . date('Y-m-d_H-i-s') . '.xlsx';
+            return Excel::download(new PmProjectsExport($data, $pmName), $fileName);
+        } catch (\Exception $e) {
+            Log::error('PM Projects Excel Export Error: ' . $e->getMessage());
+            return response()->json(['success' => false, 'message' => 'Failed to export'], 500);
+        }
+    }
+
+    /**
+     * Export AM projects to Excel
+     */
+    public function exportAmProjects(Request $request)
+    {
+        try {
+            $projectsJson = $request->input('projects', '[]');
+            $data = is_array($projectsJson) ? $projectsJson : json_decode($projectsJson, true);
+            $amName = $request->input('am_name', 'AM');
+
+            if (empty($data) || !is_array($data)) {
+                return response()->json(['success' => false, 'message' => 'No data to export'], 400);
+            }
+
+            $fileName = 'AM_Projects_' . str_replace(' ', '_', $amName) . '_' . date('Y-m-d_H-i-s') . '.xlsx';
+            return Excel::download(new AmProjectsExport($data, $amName), $fileName);
+        } catch (\Exception $e) {
+            Log::error('AM Projects Excel Export Error: ' . $e->getMessage());
+            return response()->json(['success' => false, 'message' => 'Failed to export'], 500);
+        }
     }
 }

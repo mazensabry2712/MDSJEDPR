@@ -272,9 +272,9 @@
                                 <a href="{{ route('invoices.export.pdf') }}" target="_blank" class="btn btn-sm btn-danger btn-export-pdf mr-1">
                                     <i class="fas fa-file-pdf"></i> PDF
                                 </a>
-                                <button onclick="exportToExcel()" class="btn btn-sm btn-success btn-export-excel mr-1">
+                                <a href="{{ route('invoices.export.excel') }}" class="btn btn-sm btn-success btn-export-excel mr-1">
                                     <i class="fas fa-file-excel"></i> Excel
-                                </button>
+                                </a>
                                 <a href="{{ route('invoices.print') }}" target="_blank" class="btn btn-sm btn-secondary btn-export-print mr-1">
                                     <i class="fas fa-print"></i> Print
                                 </a>
@@ -547,7 +547,7 @@
             showLoadingButton(button);
             try {
                 const dataTable = $('#example1').DataTable();
-                
+
                 // Create workbook data in Excel XML format
                 let excelData = [];
                 excelData.push(['#', 'PR Number', 'Project Name', 'Invoice Number', 'Value', 'PR Total Value', 'Project Value', 'Status']); // Headers
@@ -556,7 +556,7 @@
                 dataTable.rows({ search: 'applied' }).every(function(rowIdx) {
                     const rowNode = this.node();
                     const cells = $(rowNode).find('td');
-                    
+
                     excelData.push([
                         cells.eq(0).text().trim(),
                         cells.eq(2).text().trim(),
@@ -571,7 +571,7 @@
 
                 // Convert to Excel worksheet
                 let worksheet = '<ss:Worksheet ss:Name="Invoices"><ss:Table>';
-                
+
                 excelData.forEach((row, rowIndex) => {
                     worksheet += '<ss:Row>';
                     row.forEach((cell) => {
@@ -582,7 +582,7 @@
                             .replace(/>/g, '&gt;')
                             .replace(/"/g, '&quot;')
                             .replace(/'/g, '&apos;');
-                            
+
                         if (rowIndex === 0) {
                             // Header row
                             worksheet += '<ss:Cell ss:StyleID="header"><ss:Data ss:Type="String">' + escapedCell + '</ss:Data></ss:Cell>';
@@ -592,7 +592,7 @@
                     });
                     worksheet += '</ss:Row>';
                 });
-                
+
                 worksheet += '</ss:Table></ss:Worksheet>';
 
                 // Complete Excel XML

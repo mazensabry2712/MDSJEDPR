@@ -299,4 +299,20 @@ class InvoicesController extends Controller
         $invoices = invoices::with('project:id,pr_number,name,value')->get();
         return view('dashboard.invoice.print', compact('invoices'));
     }
+
+    /**
+     * Export Invoices to Excel
+     */
+    public function exportExcel()
+    {
+        try {
+            return \Maatwebsite\Excel\Facades\Excel::download(
+                new \App\Exports\InvoicesExport,
+                'Invoices_' . date('Y-m-d') . '.xlsx'
+            );
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Invoices Excel Export Error: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Failed to export Invoices data to Excel.');
+        }
+    }
 }

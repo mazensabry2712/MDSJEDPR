@@ -207,4 +207,20 @@ class PepoController extends Controller
             ->get();
         return view('dashboard.PEPO.print', compact('pepo'));
     }
+
+    /**
+     * Export PEPO to Excel
+     */
+    public function exportExcel()
+    {
+        try {
+            return \Maatwebsite\Excel\Facades\Excel::download(
+                new \App\Exports\PepoExport,
+                'Project_EPO_' . date('Y-m-d') . '.xlsx'
+            );
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('PEPO Excel Export Error: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Failed to export PEPO data to Excel.');
+        }
+    }
 }

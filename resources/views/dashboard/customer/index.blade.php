@@ -190,9 +190,9 @@
                                 <i class="fas fa-file-pdf"></i> PDF
                             </a>
 
-                            <button onclick="exportToExcel()" class="btn btn-sm btn-success btn-export-excel mr-1">
+                            <a href="{{ route('customer.export.excel') }}" class="btn btn-sm btn-success btn-export-excel mr-1">
                                 <i class="fas fa-file-excel"></i> Excel
-                            </button>
+                            </a>
 
                             <a href="{{ route('customer.print') }}" target="_blank" class="btn btn-sm btn-secondary btn-export-print mr-1">
                                 <i class="fas fa-print"></i> Print

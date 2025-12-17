@@ -198,9 +198,9 @@
                                 <a href="{{ route('ppos.export.pdf') }}" target="_blank" class="btn btn-sm btn-danger btn-export-pdf mr-1" title="Export to PDF">
                                     <i class="fas fa-file-pdf"></i> PDF
                                 </a>
-                                <button onclick="exportToExcel()" class="btn btn-sm btn-success btn-export-excel mr-1" title="Export to Excel">
+                                <a href="{{ route('ppos.export.excel') }}" class="btn btn-sm btn-success btn-export-excel mr-1" title="Export to Excel">
                                     <i class="fas fa-file-excel"></i> Excel
-                                </button>
+                                </a>
                                 <a href="{{ route('ppos.print') }}" target="_blank" class="btn btn-sm btn-secondary btn-export-print mr-1" title="Print">
                                     <i class="fas fa-print"></i> Print
                                 </a>

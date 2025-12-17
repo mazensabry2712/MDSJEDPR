@@ -4,11 +4,27 @@ namespace App\Http\Controllers;
 
 use App\Models\Project;
 use App\Models\Ptasks;
+use App\Exports\PtasksExport;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
+use Maatwebsite\Excel\Facades\Excel;
+use Illuminate\Support\Facades\Log;
 
 class PtasksController extends Controller
 {
+    /**
+     * Export PTasks to Excel
+     */
+    public function exportExcel()
+    {
+        try {
+            return Excel::download(new PtasksExport, 'Project_Tasks_' . date('Y-m-d_H-i-s') . '.xlsx');
+        } catch (\Exception $e) {
+            Log::error('PTasks Excel Export Error: ' . $e->getMessage());
+            return redirect()->back()->with('Error', 'Failed to export Project Tasks to Excel');
+        }
+    }
+
     /**
      * Display a listing of the resource.
      */

@@ -4,12 +4,27 @@ namespace App\Http\Controllers;
 
 use App\Models\Project;
 use App\Models\Risks;
+use App\Exports\RisksExport;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
-
+use Maatwebsite\Excel\Facades\Excel;
+use Illuminate\Support\Facades\Log;
 
 class RisksController extends Controller
 {
+    /**
+     * Export Risks to Excel
+     */
+    public function exportExcel()
+    {
+        try {
+            return Excel::download(new RisksExport, 'Project_Risks_' . date('Y-m-d_H-i-s') . '.xlsx');
+        } catch (\Exception $e) {
+            Log::error('Risks Excel Export Error: ' . $e->getMessage());
+            return redirect()->back()->with('Error', 'Failed to export Risks to Excel');
+        }
+    }
+
     /**
      * Display a listing of the resource.
      */
@@ -187,11 +202,11 @@ class RisksController extends Controller
             // Get current Y position
             $startY = $pdf->GetY();
             $startX = $pdf->GetX();
-            
+
             // Calculate row height based on content
             $riskText = $item->risk ?: 'No description';
             $mitigationText = $item->mitigation ?: 'N/A';
-            
+
             // Estimate heights needed
             $pdf->SetFont('helvetica', '', 8);
             $riskHeight = $pdf->getStringHeight($widths[3], $riskText);
@@ -202,11 +217,11 @@ class RisksController extends Controller
             // Column 1: #
             $pdf->SetXY($startX, $startY);
             $pdf->MultiCell($widths[0], $rowHeight, ($index + 1), 1, 'C', true, 0);
-            
+
             // Column 2: PR Number
             $pdf->SetXY($startX + $widths[0], $startY);
             $pdf->MultiCell($widths[1], $rowHeight, $item->project->pr_number ?? 'N/A', 1, 'L', true, 0);
-            
+
             // Column 3: Project Name
             $pdf->SetXY($startX + $widths[0] + $widths[1], $startY);
             $projectName = $item->project->name ?? 'N/A';
@@ -214,24 +229,24 @@ class RisksController extends Controller
                 $projectName = substr($projectName, 0, 27) . '...';
             }
             $pdf->MultiCell($widths[2], $rowHeight, $projectName, 1, 'L', true, 0);
-            
+
             // Column 4: Risk/Issue (with text wrapping)
             $pdf->SetXY($startX + $widths[0] + $widths[1] + $widths[2], $startY);
             $pdf->MultiCell($widths[3], $rowHeight, $riskText, 1, 'L', true, 0);
-            
+
             // Column 5: Impact
             $pdf->SetXY($startX + $widths[0] + $widths[1] + $widths[2] + $widths[3], $startY);
             $impactText = $item->impact == 'low' ? 'Low' : ($item->impact == 'med' ? 'Medium' : 'High');
             $pdf->MultiCell($widths[4], $rowHeight, $impactText, 1, 'C', true, 0);
-            
+
             // Column 6: Mitigation (with text wrapping)
             $pdf->SetXY($startX + $widths[0] + $widths[1] + $widths[2] + $widths[3] + $widths[4], $startY);
             $pdf->MultiCell($widths[5], $rowHeight, $mitigationText, 1, 'L', true, 0);
-            
+
             // Column 7: Owner
             $pdf->SetXY($startX + $widths[0] + $widths[1] + $widths[2] + $widths[3] + $widths[4] + $widths[5], $startY);
             $pdf->MultiCell($widths[6], $rowHeight, $item->owner ?? 'N/A', 1, 'L', true, 0);
-            
+
             // Column 8: Status
             $pdf->SetXY($startX + $widths[0] + $widths[1] + $widths[2] + $widths[3] + $widths[4] + $widths[5] + $widths[6], $startY);
             $statusText = $item->status == 'open' ? 'Open' : 'Closed';

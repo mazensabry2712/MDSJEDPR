@@ -5,11 +5,27 @@ namespace App\Http\Controllers;
 use App\Models\ppms;
 use App\Models\Project;
 use App\Models\Pstatus;
+use App\Exports\PstatusExport;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
+use Maatwebsite\Excel\Facades\Excel;
+use Illuminate\Support\Facades\Log;
 
 class PstatusController extends Controller
 {
+    /**
+     * Export PStatus to Excel
+     */
+    public function exportExcel()
+    {
+        try {
+            return Excel::download(new PstatusExport, 'Project_Status_' . date('Y-m-d_H-i-s') . '.xlsx');
+        } catch (\Exception $e) {
+            Log::error('PStatus Excel Export Error: ' . $e->getMessage());
+            return redirect()->back()->with('Error', 'Failed to export Project Status to Excel');
+        }
+    }
+
     /**
      * Display a listing of the resource.
      */

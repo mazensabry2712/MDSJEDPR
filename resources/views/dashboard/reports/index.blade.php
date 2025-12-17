@@ -734,8 +734,11 @@
 
         {{-- Projects Table --}}
         <div id="projectsTableCard" class="projects-table-card" style="display: none;">
-            <div class="card-header">
+            <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
                 <h4><i class="fas fa-list mr-2"></i>Customer Projects</h4>
+                <button onclick="exportCustomerProjectsToExcel()" class="btn btn-sm btn-success" style="transition: all 0.3s ease;">
+                    <i class="fas fa-file-excel"></i> Export to Excel
+                </button>
             </div>
             <div class="table-responsive">
                 <table class="table table-modern table-hover mb-0">
@@ -814,8 +817,11 @@
 
         {{-- Vendor Projects Table --}}
         <div id="projectsTableCardVendor" class="projects-table-card" style="display: none;">
-            <div class="card-header" style="background: linear-gradient(135deg, #28a745 0%, #218838 100%);">
+            <div class="card-header" style="display: flex; justify-content: space-between; align-items: center; background: linear-gradient(135deg, #28a745 0%, #218838 100%);">
                 <h4><i class="fas fa-list mr-2"></i>Vendor Projects</h4>
+                <button onclick="exportVendorProjectsToExcel()" class="btn btn-sm btn-success" style="transition: all 0.3s ease;">
+                    <i class="fas fa-file-excel"></i> Export to Excel
+                </button>
             </div>
             <div class="table-responsive">
                 <table class="table table-modern table-hover mb-0">
@@ -895,8 +901,11 @@
 
         {{-- Supplier Projects Table --}}
         <div id="projectsTableCardSupplier" class="projects-table-card" style="display: none;">
-            <div class="card-header" style="background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%);">
+            <div class="card-header" style="display: flex; justify-content: space-between; align-items: center; background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%);">
                 <h4><i class="fas fa-list mr-2"></i>Supplier Projects & POs</h4>
+                <button onclick="exportSupplierProjectsToExcel()" class="btn btn-sm btn-warning" style="transition: all 0.3s ease;">
+                    <i class="fas fa-file-excel"></i> Export to Excel
+                </button>
             </div>
             <div class="table-responsive">
                 <table class="table table-modern table-hover mb-0">
@@ -969,8 +978,11 @@
 
         {{-- PM Projects Table --}}
         <div id="projectsTableCardPM" class="projects-table-card" style="display: none;">
-            <div class="card-header" style="background: linear-gradient(135deg, #6f42c1 0%, #5a32a3 100%);">
+            <div class="card-header" style="display: flex; justify-content: space-between; align-items: center; background: linear-gradient(135deg, #6f42c1 0%, #5a32a3 100%);">
                 <h4><i class="fas fa-list mr-2"></i>PM Projects</h4>
+                <button onclick="exportPmProjectsToExcel()" class="btn btn-sm btn-info" style="transition: all 0.3s ease;">
+                    <i class="fas fa-file-excel"></i> Export to Excel
+                </button>
             </div>
             <div class="table-responsive">
                 <table class="table table-modern table-hover mb-0">
@@ -1042,8 +1054,11 @@
 
         {{-- AM Projects Table --}}
         <div id="projectsTableCardAM" class="projects-table-card" style="display: none;">
-            <div class="card-header" style="background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);">
+            <div class="card-header" style="display: flex; justify-content: space-between; align-items: center; background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);">
                 <h4><i class="fas fa-list mr-2"></i>AM Projects</h4>
+                <button onclick="exportAmProjectsToExcel()" class="btn btn-sm btn-info" style="transition: all 0.3s ease;">
+                    <i class="fas fa-file-excel"></i> Export to Excel
+                </button>
             </div>
             <div class="table-responsive">
                 <table class="table table-modern table-hover mb-0">
@@ -1283,6 +1298,218 @@ $(document).ready(function() {
                 console.error('AJAX Error:', xhr);
             }
         });
+    }
+
+    // Function to export customer projects to Excel
+    function exportCustomerProjectsToExcel() {
+        // Get the customer name
+        const customerName = $('#customerName').text().trim() || 'Customer';
+
+        // Check if there are projects in the table
+        const tableRows = $('#projectsTableBody tr');
+        if (tableRows.length === 0) {
+            showToast('No projects to export', 'warning');
+            return;
+        }
+
+        // Extract projects data from the table
+        const projects = [];
+        tableRows.each(function(index) {
+            const row = $(this);
+            const cells = row.find('td');
+
+            projects.push({
+                pr_number: cells.eq(1).text().trim(),
+                name: cells.eq(2).text().trim(),
+                value: cells.eq(3).text().replace('$', '').trim(),
+                customer_po: cells.eq(4).text().trim(),
+                deadline: cells.eq(5).text().trim()
+            });
+        });
+
+        // Create a form and submit it
+        const form = $('<form>', {
+            method: 'POST',
+            action: '{{ route('reports.export.customer.projects') }}',
+            target: '_blank'
+        });
+
+        // Add CSRF token
+        form.append($('<input>', {
+            type: 'hidden',
+            name: '_token',
+            value: '{{ csrf_token() }}'
+        }));
+
+        // Add customer name
+        form.append($('<input>', {
+            type: 'hidden',
+            name: 'customer_name',
+            value: customerName
+        }));
+
+        // Add projects data
+        form.append($('<input>', {
+            type: 'hidden',
+            name: 'projects',
+            value: JSON.stringify(projects)
+        }));
+
+        // Append form to body, submit, and remove
+        form.appendTo('body').submit().remove();
+
+        showToast('Exporting customer projects to Excel...', 'success');
+    }
+
+    // Function to export vendor projects to Excel
+    function exportVendorProjectsToExcel() {
+        const vendorName = $('#vendorName').text().trim() || 'Vendor';
+        const tableRows = $('#projectsTableBodyVendor tr');
+
+        if (tableRows.length === 0) {
+            showToast('No projects to export', 'warning');
+            return;
+        }
+
+        const projects = [];
+        tableRows.each(function() {
+            const row = $(this);
+            const cells = row.find('td');
+
+            projects.push({
+                pr_number: cells.eq(1).text().trim(),
+                name: cells.eq(2).text().trim(),
+                customer: cells.eq(3).text().trim(),
+                value: cells.eq(4).text().replace('$', '').trim(),
+                po_number: cells.eq(5).text().trim(),
+                deadline: cells.eq(6).text().trim()
+            });
+        });
+
+        const form = $('<form>', {
+            method: 'POST',
+            action: '{{ route('reports.export.vendor.projects') }}',
+            target: '_blank'
+        });
+
+        form.append($('<input>', { type: 'hidden', name: '_token', value: '{{ csrf_token() }}' }));
+        form.append($('<input>', { type: 'hidden', name: 'vendor_name', value: vendorName }));
+        form.append($('<input>', { type: 'hidden', name: 'projects', value: JSON.stringify(projects) }));
+        form.appendTo('body').submit().remove();
+
+        showToast('Exporting vendor projects to Excel...', 'success');
+    }
+
+    // Function to export supplier projects to Excel
+    function exportSupplierProjectsToExcel() {
+        const supplierName = $('#supplierName').text().trim() || 'Supplier';
+        const tableRows = $('#projectsTableBodySupplier tr');
+
+        if (tableRows.length === 0) {
+            showToast('No projects to export', 'warning');
+            return;
+        }
+
+        const projects = [];
+        tableRows.each(function() {
+            const row = $(this);
+            const cells = row.find('td');
+
+            projects.push({
+                pr_number: cells.eq(1).text().trim(),
+                name: cells.eq(2).text().trim(),
+                po_number: cells.eq(3).text().trim(),
+                po_value: cells.eq(4).text().replace('$', '').trim(),
+                all_ds: cells.eq(5).text().trim()
+            });
+        });
+
+        const form = $('<form>', {
+            method: 'POST',
+            action: '{{ route('reports.export.supplier.projects') }}',
+            target: '_blank'
+        });
+
+        form.append($('<input>', { type: 'hidden', name: '_token', value: '{{ csrf_token() }}' }));
+        form.append($('<input>', { type: 'hidden', name: 'supplier_name', value: supplierName }));
+        form.append($('<input>', { type: 'hidden', name: 'projects', value: JSON.stringify(projects) }));
+        form.appendTo('body').submit().remove();
+
+        showToast('Exporting supplier projects to Excel...', 'success');
+    }
+
+    // Function to export PM projects to Excel
+    function exportPmProjectsToExcel() {
+        const pmName = $('#pmName').text().trim() || 'PM';
+        const tableRows = $('#projectsTableBodyPM tr');
+
+        if (tableRows.length === 0) {
+            showToast('No projects to export', 'warning');
+            return;
+        }
+
+        const projects = [];
+        tableRows.each(function() {
+            const row = $(this);
+            const cells = row.find('td');
+
+            projects.push({
+                pr_number: cells.eq(1).text().trim(),
+                name: cells.eq(2).text().trim(),
+                customer: cells.eq(3).text().trim(),
+                value: cells.eq(4).text().replace('$', '').trim()
+            });
+        });
+
+        const form = $('<form>', {
+            method: 'POST',
+            action: '{{ route('reports.export.pm.projects') }}',
+            target: '_blank'
+        });
+
+        form.append($('<input>', { type: 'hidden', name: '_token', value: '{{ csrf_token() }}' }));
+        form.append($('<input>', { type: 'hidden', name: 'pm_name', value: pmName }));
+        form.append($('<input>', { type: 'hidden', name: 'projects', value: JSON.stringify(projects) }));
+        form.appendTo('body').submit().remove();
+
+        showToast('Exporting PM projects to Excel...', 'success');
+    }
+
+    // Function to export AM projects to Excel
+    function exportAmProjectsToExcel() {
+        const amName = $('#amName').text().trim() || 'AM';
+        const tableRows = $('#projectsTableBodyAM tr');
+
+        if (tableRows.length === 0) {
+            showToast('No projects to export', 'warning');
+            return;
+        }
+
+        const projects = [];
+        tableRows.each(function() {
+            const row = $(this);
+            const cells = row.find('td');
+
+            projects.push({
+                pr_number: cells.eq(1).text().trim(),
+                name: cells.eq(2).text().trim(),
+                customer: cells.eq(3).text().trim(),
+                value: cells.eq(4).text().replace('$', '').trim()
+            });
+        });
+
+        const form = $('<form>', {
+            method: 'POST',
+            action: '{{ route('reports.export.am.projects') }}',
+            target: '_blank'
+        });
+
+        form.append($('<input>', { type: 'hidden', name: '_token', value: '{{ csrf_token() }}' }));
+        form.append($('<input>', { type: 'hidden', name: 'am_name', value: amName }));
+        form.append($('<input>', { type: 'hidden', name: 'projects', value: JSON.stringify(projects) }));
+        form.appendTo('body').submit().remove();
+
+        showToast('Exporting AM projects to Excel...', 'success');
     }
 
     // Helper function to escape HTML

@@ -250,4 +250,20 @@ class MilestonesController extends Controller
             ->get();
         return view('dashboard.Milestones.print', compact('milestones'));
     }
+
+    /**
+     * Export Milestones to Excel
+     */
+    public function exportExcel()
+    {
+        try {
+            return \Maatwebsite\Excel\Facades\Excel::download(
+                new \App\Exports\MilestonesExport,
+                'Milestones_' . date('Y-m-d') . '.xlsx'
+            );
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Milestones Excel Export Error: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Failed to export Milestones data to Excel.');
+        }
+    }
 }

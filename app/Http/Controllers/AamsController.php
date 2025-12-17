@@ -184,4 +184,18 @@ class AamsController extends Controller
         $aams = aams::select('id', 'name', 'email', 'phone')->get();
         return view('dashboard.AMs.print', compact('aams'));
     }
+
+    /**
+     * Export AMs to Excel using Maatwebsite/Laravel-Excel
+     */
+    public function exportExcel()
+    {
+        try {
+            $fileName = 'Account_Managers_' . date('Y-m-d') . '.xlsx';
+            return \Maatwebsite\Excel\Facades\Excel::download(new \App\Exports\AmsExport, $fileName);
+        } catch (Exception $e) {
+            Log::error('AMs Excel export error: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Error exporting Excel: ' . $e->getMessage());
+        }
+    }
 }

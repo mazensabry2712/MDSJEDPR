@@ -3,11 +3,27 @@
 namespace App\Http\Controllers;
 
 use App\Models\vendors;
+use App\Exports\VendorsExport;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
+use Maatwebsite\Excel\Facades\Excel;
+use Illuminate\Support\Facades\Log;
 
 class VendorsController extends Controller
 {
+    /**
+     * Export Vendors to Excel
+     */
+    public function exportExcel()
+    {
+        try {
+            return Excel::download(new VendorsExport, 'Vendors_' . date('Y-m-d_H-i-s') . '.xlsx');
+        } catch (\Exception $e) {
+            Log::error('Vendors Excel Export Error: ' . $e->getMessage());
+            return redirect()->back()->with('Error', 'Failed to export Vendors to Excel');
+        }
+    }
+
     /**
      * Display a listing of the resource.
      */
