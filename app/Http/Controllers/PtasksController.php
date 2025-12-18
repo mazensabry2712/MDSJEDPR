@@ -207,14 +207,44 @@ class PtasksController extends Controller
                 $pdf->SetFillColor(255, 255, 255);
             }
 
-            $pdf->Cell($widths[0], 10, ($index + 1), 1, 0, 'C', true);
-            $pdf->Cell($widths[1], 10, $item->project->pr_number ?? 'N/A', 1, 0, 'L', true);
-            $pdf->Cell($widths[2], 10, $item->project->name ?? 'N/A', 1, 0, 'L', true);
-            $pdf->Cell($widths[3], 10, $item->task_date ? \Carbon\Carbon::parse($item->task_date)->format('d/m/Y') : 'N/A', 1, 0, 'C', true);
-            $pdf->Cell($widths[4], 10, $item->details ?? 'N/A', 1, 0, 'L', true);
-            $pdf->Cell($widths[5], 10, $item->assigned ?? 'N/A', 1, 0, 'L', true);
-            $pdf->Cell($widths[6], 10, $item->expected_com_date ? \Carbon\Carbon::parse($item->expected_com_date)->format('d/m/Y') : 'N/A', 1, 0, 'C', true);
-            $pdf->Cell($widths[7], 10, $item->status ?? 'N/A', 1, 1, 'L', true);
+            // Calculate dynamic row height based on Task Details
+            $details = $item->details ?? 'N/A';
+            $detailsHeight = $pdf->getStringHeight($widths[4] - 2, $details);
+            $rowHeight = max(10, $detailsHeight + 2);
+
+            // Store starting Y position for this row
+            $startY = $pdf->GetY();
+
+            // Draw cells with dynamic height
+            $pdf->Cell($widths[0], $rowHeight, ($index + 1), 1, 0, 'C', true);
+            $pdf->Cell($widths[1], $rowHeight, $item->project->pr_number ?? 'N/A', 1, 0, 'L', true);
+            $pdf->Cell($widths[2], $rowHeight, $item->project->name ?? 'N/A', 1, 0, 'L', true);
+            $pdf->Cell($widths[3], $rowHeight, $item->task_date ? \Carbon\Carbon::parse($item->task_date)->format('d/m/Y') : 'N/A', 1, 0, 'C', true);
+
+            // Draw empty bordered cell for Task Details
+            $detailsX = $pdf->GetX();
+            $pdf->Cell($widths[4], $rowHeight, '', 1, 0, 'L', true);
+
+            // Calculate vertical centering for Task Details
+            $verticalPadding = ($rowHeight - $detailsHeight) / 2;
+            $detailsY = $startY + max(0.5, $verticalPadding);
+
+            // Place Task Details text inside with text wrapping (~35 characters)
+            $pdf->SetXY($detailsX + 1, $detailsY);
+            $pdf->MultiCell($widths[4] - 2, $rowHeight, $details, 0, 'L', false, 0);
+
+            // Reset fill color for remaining cells
+            if ($fill) {
+                $pdf->SetFillColor(245, 245, 245);
+            } else {
+                $pdf->SetFillColor(255, 255, 255);
+            }
+
+            // Continue with remaining cells
+            $pdf->SetXY($detailsX + $widths[4], $startY);
+            $pdf->Cell($widths[5], $rowHeight, $item->assigned ?? 'N/A', 1, 0, 'L', true);
+            $pdf->Cell($widths[6], $rowHeight, $item->expected_com_date ? \Carbon\Carbon::parse($item->expected_com_date)->format('d/m/Y') : 'N/A', 1, 0, 'C', true);
+            $pdf->Cell($widths[7], $rowHeight, $item->status ?? 'N/A', 1, 1, 'L', true);
 
             $fill = !$fill;
         }

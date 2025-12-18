@@ -120,6 +120,8 @@
         .field-value {
             color: #000;
             display: inline-block;
+            word-wrap: break-word;
+            max-width: 70mm;
         }
 
         .field-value.value-amount {
@@ -282,7 +284,7 @@
                     </div>
                     <div class="field">
                         <span class="field-label">Updates:</span>
-                        <span class="field-value">{{ Str::limit($ppo->updates ?? 'No updates', 35) }}</span>
+                        <span class="field-value">{{ $ppo->updates ?? 'No updates' }}</span>
                     </div>
                 </div>
 
@@ -306,7 +308,7 @@
                     </div>
                     <div class="field">
                         <span class="field-label">Notes:</span>
-                        <span class="field-value">{{ Str::limit($ppo->notes ?? 'No notes', 25) }}</span>
+                        <span class="field-value">{{ $ppo->notes ?? 'No notes' }}</span>
                     </div>
                 </div>
             </div>

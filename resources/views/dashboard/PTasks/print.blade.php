@@ -107,9 +107,13 @@
 
         .text-truncate {
             max-width: 150px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
+        }
+
+        .task-details-cell {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            max-width: 250px;
+            line-height: 1.4;
         }
 
         .status-badge {
@@ -209,7 +213,7 @@
                             N/A
                         @endif
                     </td>
-                    <td class="text-truncate" title="{{ $item->details ?? 'No details' }}">
+                    <td class="task-details-cell">
                         {{ $item->details ?? 'No details' }}
                     </td>
                     <td>{{ $item->assigned ?? 'Not assigned' }}</td>

@@ -124,6 +124,13 @@
             text-overflow: ellipsis;
         }
 
+        .notes-cell {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            max-width: 200px;
+            line-height: 1.4;
+        }
+
         .status-badge {
             padding: 3px 8px;
             border-radius: 3px;
@@ -223,7 +230,7 @@
                     <td class="text-truncate" title="{{ $item->date_pending_cost_orders ?? 'N/A' }}">
                         {{ $item->date_pending_cost_orders ?? 'N/A' }}
                     </td>
-                    <td class="text-truncate" title="{{ $item->notes ?? 'No notes' }}">
+                    <td class="notes-cell">
                         {{ $item->notes ?? 'No notes' }}
                     </td>
                 </tr>

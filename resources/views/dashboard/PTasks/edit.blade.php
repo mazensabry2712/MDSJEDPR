@@ -58,16 +58,12 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label for="pr_number">PR#: <span class="text-danger">*</span></label>
-                                    <select name="pr_number" id="pr_number" class="form-control select2" required>
-                                        <option value="">Choose Project</option>
-                                        @foreach ($projects as $project)
-                                            <option value="{{ $project->id }}" data-project-name="{{ $project->name }}"
-                                                {{ (old('pr_number', $ptasks->pr_number) == $project->id) ? 'selected' : '' }}>
-                                                {{ $project->pr_number }}
-                                            </option>
-                                        @endforeach
-                                    </select>
+                                    <label for="pr_number_display">PR#: <span class="text-danger">*</span></label>
+                                    <input type="text" id="pr_number_display" class="form-control" readonly
+                                           style="background-color: #f8f9fa; cursor: not-allowed;"
+                                           value="{{ $ptasks->project->pr_number ?? '' }}">
+                                    <input type="hidden" name="pr_number" value="{{ $ptasks->pr_number }}">
+                                    <small class="text-muted">PR Number cannot be changed after creation.</small>
                                 </div>
                             </div>
 
@@ -75,7 +71,8 @@
                                 <div class="form-group">
                                     <label>Project Name:</label>
                                     <input type="text" id="project_name_display" class="form-control" readonly
-                                           style="background-color: #f8f9fa; cursor: not-allowed;">
+                                           style="background-color: #f8f9fa; cursor: not-allowed;"
+                                           value="{{ $ptasks->project->name ?? '' }}">
                                 </div>
                             </div>
                         </div>
@@ -150,27 +147,7 @@
 
     <script>
         $(document).ready(function() {
-            $('.select2').select2({
-                placeholder: "Choose Project",
-                allowClear: true
-            });
-
-            // Auto-fill project name when PR Number changes
-            $('#pr_number').on('change', function() {
-                const selectedOption = $(this).find('option:selected');
-                const projectName = selectedOption.data('project-name');
-
-                if (projectName) {
-                    $('#project_name_display').val(projectName).css('color', '#495057');
-                } else {
-                    $('#project_name_display').val('No project name available').css('color', '#6c757d');
-                }
-            });
-
-            // Initialize on page load with current value
-            if ($('#pr_number').val()) {
-                $('#pr_number').trigger('change');
-            }
+            // No dynamic functionality needed - PR Number and Project Name are now readonly
         });
     </script>
 @endsection
