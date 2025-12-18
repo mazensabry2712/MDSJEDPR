@@ -413,7 +413,7 @@
 @endsection
 @section('content')
     <!-- row -->
-    <div class="row row-sm">
+    {{-- <div class="row row-sm">
 
         <div class="col-xl-2 col-lg-4 col-md-6 col-sm-6">
             <div class="card overflow-hidden sales-card bg-primary-gradient">
@@ -653,9 +653,9 @@
             </div>
         </div>
 
-    </div>
+    </div> --}}
     <!-- row 2 -->
-    <div class="row row-sm">
+    {{-- <div class="row row-sm">
 
         <div class="col-xl-2 col-lg-4 col-md-6 col-sm-6">
             <div class="card overflow-hidden sales-card bg-primary-gradient">
@@ -735,7 +735,7 @@
                 </div>
             </div>
         </div>
-    </div>
+    </div> --}}
     <!-- row closed -->
 
     {{-- ========== FILTER SECTION WITH SIDEBAR ========== --}}
