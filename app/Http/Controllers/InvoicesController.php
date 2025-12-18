@@ -208,87 +208,191 @@ class InvoicesController extends Controller
      */
     public function exportPDF()
     {
-        $invoices = invoices::with('project:id,pr_number,name,value')->get();
+        try {
+            $invoices = invoices::with('project:id,pr_number,name,value')->get();
 
-        $pdf = new \TCPDF('L', 'mm', 'A4', true, 'UTF-8', false);
+            $pdf = new \TCPDF('P', 'mm', 'A4', true, 'UTF-8', false);
 
-        // Set document information
-        $pdf->SetCreator('MDSJEDPR');
-        $pdf->SetAuthor('MDSJEDPR');
-        $pdf->SetTitle('Invoices');
-        $pdf->SetSubject('Invoices List');
+            // Set document information
+            $pdf->SetCreator('MDS JED Project System');
+            $pdf->SetAuthor('Corporate Sites Management System');
+            $pdf->SetTitle('Invoices Report');
+            $pdf->SetSubject('Invoices Export - Card View');
 
-        // Remove default header/footer
-        $pdf->setPrintHeader(false);
-        $pdf->setPrintFooter(false);
+            // Remove default header/footer
+            $pdf->setPrintHeader(false);
+            $pdf->setPrintFooter(false);
 
-        // Set margins
-        $pdf->SetMargins(10, 10, 10);
-        $pdf->SetAutoPageBreak(TRUE, 10);
+            // Set margins for A4
+            $pdf->SetMargins(10, 10, 10);
+            $pdf->SetAutoPageBreak(false);
 
-        // Add a page
-        $pdf->AddPage();
+            // Set font
+            $pdf->SetFont('helvetica', '', 9);
 
-        // Add system name at top
-        $pdf->SetFont('helvetica', 'B', 16);
-        $pdf->SetTextColor(103, 126, 234); // #677EEA
-        $pdf->Cell(0, 10, 'MDSJEDPR', 0, 1, 'C');
+            $cardCount = 0;
+            $cardsPerPage = 5;
+            $cardHeight = 52;
+            $cardGap = 1.5;
 
-        // Add title
-        $pdf->SetFont('helvetica', 'B', 14);
-        $pdf->SetTextColor(0, 0, 0);
-        $pdf->Cell(0, 10, 'Invoices Management', 0, 1, 'C');
+            foreach ($invoices as $index => $invoice) {
+                // Add new page for every set of cards
+                if ($cardCount % $cardsPerPage == 0) {
+                    $pdf->AddPage('P');
 
-        // Add date
-        $pdf->SetFont('helvetica', '', 10);
-        $pdf->SetTextColor(100, 100, 100);
-        $pdf->Cell(0, 8, 'Generated: ' . date('m/d/Y, g:i:s A'), 0, 1, 'C');
-        $pdf->Ln(5);
+                    // Page Header
+                    $pdf->SetFont('helvetica', 'B', 14);
+                    $pdf->SetTextColor(103, 126, 234);
+                    $pdf->Cell(0, 8, 'Invoices Report', 0, 1, 'C');
 
-        // Table header
-        $pdf->SetFont('helvetica', 'B', 9);
-        $pdf->SetFillColor(103, 126, 234); // #677EEA
-        $pdf->SetTextColor(255, 255, 255);
-        $pdf->SetDrawColor(221, 221, 221);
+                    $pdf->SetFont('helvetica', '', 8);
+                    $pdf->SetTextColor(120, 120, 120);
+                    $pdf->Cell(0, 5, 'Generated: ' . date('d/m/Y g:i A'), 0, 1, 'C');
+                    $pdf->Ln(2);
 
-        // Column widths (total 277mm for Landscape A4)
-        $widths = array(10, 30, 50, 35, 35, 40, 40, 37);
+                    // Add footer for each page
+                    $pdf->SetY(-10);
+                    $pdf->SetFont('helvetica', 'B', 9);
+                    $pdf->SetTextColor(103, 126, 234);
+                    $pdf->Cell(0, 8, 'MDSJEDPR', 0, 0, 'C');
 
-        $pdf->Cell($widths[0], 10, '#', 1, 0, 'C', true);
-        $pdf->Cell($widths[1], 10, 'PR Number', 1, 0, 'L', true);
-        $pdf->Cell($widths[2], 10, 'Project Name', 1, 0, 'L', true);
-        $pdf->Cell($widths[3], 10, 'Invoice Number', 1, 0, 'L', true);
-        $pdf->Cell($widths[4], 10, 'Value', 1, 0, 'R', true);
-        $pdf->Cell($widths[5], 10, 'PR Total Value', 1, 0, 'R', true);
-        $pdf->Cell($widths[6], 10, 'Project Value', 1, 0, 'R', true);
-        $pdf->Cell($widths[7], 10, 'Status', 1, 1, 'C', true);
+                    // Reset Y position for content
+                    $pdf->SetY(25);
+                }
 
-        // Table content
-        $pdf->SetFont('helvetica', '', 8);
-        $pdf->SetTextColor(0, 0, 0);
+                // Card container
+                $cardY = $pdf->GetY();
 
-        $fill = false;
-        foreach ($invoices as $index => $invoice) {
-            if ($fill) {
-                $pdf->SetFillColor(245, 245, 245);
-            } else {
+                // Card border and background
                 $pdf->SetFillColor(255, 255, 255);
+                $pdf->SetDrawColor(103, 126, 234);
+                $pdf->SetLineWidth(0.5);
+                $pdf->RoundedRect(10, $cardY, 190, $cardHeight, 3, '1111', 'DF');
+
+                // Card header with invoice number
+                $pdf->SetFillColor(103, 126, 234);
+                $pdf->SetTextColor(255, 255, 255);
+                $pdf->RoundedRect(10, $cardY, 190, 8, 3, '1100', 'F');
+
+                $pdf->SetXY(12, $cardY + 1.5);
+                $pdf->SetFont('helvetica', 'B', 9);
+                $pdf->Cell(90, 5, 'Invoice: ' . ($invoice->invoice_number ?? 'N/A'), 0, 0, 'L');
+
+                $pdf->SetFont('helvetica', '', 7);
+                $pdf->Cell(96, 5, 'Invoice #' . ($index + 1), 0, 1, 'R');
+
+                // Content area starts below the header
+                $contentStartY = $cardY + 10;
+                $currentY = $contentStartY;
+
+                // Column settings
+                $leftX = 15;
+                $rightX = 105;
+                $labelWidth = 40;
+                $valueWidth = 45;
+                $lineHeight = 6;
+
+                // === LEFT COLUMN ===
+                // Invoice Number
+                $pdf->SetXY($leftX, $currentY);
+                $pdf->SetFont('helvetica', 'B', 8);
+                $pdf->SetTextColor(80, 80, 80);
+                $pdf->Cell($labelWidth, $lineHeight, 'Invoice Number:', 0, 0, 'L');
+                $pdf->SetFont('helvetica', '', 8);
+                $pdf->SetTextColor(0, 0, 0);
+                $pdf->Cell($valueWidth, $lineHeight, $invoice->invoice_number ?? 'N/A', 0, 1, 'L');
+                $currentY += $lineHeight;
+
+                // PR Number
+                $pdf->SetXY($leftX, $currentY);
+                $pdf->SetFont('helvetica', 'B', 8);
+                $pdf->SetTextColor(80, 80, 80);
+                $pdf->Cell($labelWidth, $lineHeight, 'PR Number:', 0, 0, 'L');
+                $pdf->SetFont('helvetica', '', 8);
+                $pdf->SetTextColor(0, 0, 0);
+                $pdf->Cell($valueWidth, $lineHeight, $invoice->project->pr_number ?? 'N/A', 0, 1, 'L');
+                $currentY += $lineHeight;
+
+                // Project Name
+                $pdf->SetXY($leftX, $currentY);
+                $pdf->SetFont('helvetica', 'B', 8);
+                $pdf->SetTextColor(80, 80, 80);
+                $pdf->Cell($labelWidth, $lineHeight, 'Project Name:', 0, 0, 'L');
+                $pdf->SetFont('helvetica', '', 8);
+                $pdf->SetTextColor(0, 0, 0);
+                $projectName = $invoice->project->name ?? 'N/A';
+                if (strlen($projectName) > 30) {
+                    $projectName = substr($projectName, 0, 30) . '...';
+                }
+                $pdf->Cell($valueWidth, $lineHeight, $projectName, 0, 1, 'L');
+                $currentY += $lineHeight;
+
+                // Invoice Value
+                $pdf->SetXY($leftX, $currentY);
+                $pdf->SetFont('helvetica', 'B', 8);
+                $pdf->SetTextColor(80, 80, 80);
+                $pdf->Cell($labelWidth, $lineHeight, 'Invoice Value:', 0, 0, 'L');
+                $pdf->SetFont('helvetica', 'B', 8);
+                $pdf->SetTextColor(0, 128, 0);
+                $pdf->Cell($valueWidth, $lineHeight, $invoice->value ? number_format($invoice->value, 2) . ' SAR' : 'N/A', 0, 1, 'L');
+
+                // === RIGHT COLUMN ===
+                $rightY = $contentStartY;
+
+                // PR Invoices Total Value
+                $pdf->SetXY($rightX, $rightY);
+                $pdf->SetFont('helvetica', 'B', 8);
+                $pdf->SetTextColor(80, 80, 80);
+                $pdf->Cell($labelWidth, $lineHeight, 'PR Invoices Total:', 0, 1, 'L');
+                $rightY += $lineHeight;
+
+                $pdf->SetXY($rightX, $rightY);
+                $pdf->SetFont('helvetica', '', 8);
+                $pdf->SetTextColor(0, 0, 128);
+                $totalValueText = number_format($invoice->pr_invoices_total_value, 2);
+                if ($invoice->project && $invoice->project->value) {
+                    $totalValueText .= ' of ' . number_format($invoice->project->value, 2);
+                }
+                $pdf->Cell($labelWidth, $lineHeight, $totalValueText . ' SAR', 0, 1, 'L');
+                $rightY += $lineHeight;
+
+                // Status
+                $pdf->SetXY($rightX, $rightY);
+                $pdf->SetFont('helvetica', 'B', 8);
+                $pdf->SetTextColor(80, 80, 80);
+                $pdf->Cell($labelWidth, $lineHeight, 'Status:', 0, 0, 'L');
+                $pdf->SetFont('helvetica', '', 8);
+                $pdf->SetTextColor(0, 0, 0);
+                $pdf->Cell($valueWidth, $lineHeight, $invoice->status ?? 'N/A', 0, 1, 'L');
+                $rightY += $lineHeight;
+
+                // Created Date
+                $pdf->SetXY($rightX, $rightY);
+                $pdf->SetFont('helvetica', 'B', 8);
+                $pdf->SetTextColor(80, 80, 80);
+                $pdf->Cell($labelWidth, $lineHeight, 'Created Date:', 0, 0, 'L');
+                $pdf->SetFont('helvetica', '', 8);
+                $pdf->SetTextColor(0, 0, 0);
+                $pdf->Cell($valueWidth, $lineHeight, $invoice->created_at ? $invoice->created_at->format('d/m/Y') : 'N/A', 0, 1, 'L');
+
+                // Move to next card position (with gap between cards)
+                $pdf->SetY($cardY + $cardHeight + $cardGap);
+                $cardCount++;
             }
 
-            $pdf->Cell($widths[0], 10, ($index + 1), 1, 0, 'C', true);
-            $pdf->Cell($widths[1], 10, $invoice->project->pr_number ?? 'N/A', 1, 0, 'L', true);
-            $pdf->Cell($widths[2], 10, $invoice->project->name ?? 'N/A', 1, 0, 'L', true);
-            $pdf->Cell($widths[3], 10, $invoice->invoice_number, 1, 0, 'L', true);
-            $pdf->Cell($widths[4], 10, number_format($invoice->value, 2) . ' SAR', 1, 0, 'R', true);
-            $pdf->Cell($widths[5], 10, number_format($invoice->pr_invoices_total_value, 2), 1, 0, 'R', true);
-            $pdf->Cell($widths[6], 10, number_format($invoice->project->value ?? 0, 2), 1, 0, 'R', true);
-            $pdf->Cell($widths[7], 10, $invoice->status, 1, 1, 'C', true);
+            // Output PDF
+            $filename = 'Invoices_Cards_' . date('Y-m-d_His') . '.pdf';
 
-            $fill = !$fill;
+            return response()->streamDownload(function() use ($pdf) {
+                echo $pdf->Output('', 'S');
+            }, $filename, [
+                'Content-Type' => 'application/pdf',
+            ]);
+
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Invoices PDF export error: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Error generating PDF: ' . $e->getMessage());
         }
-
-        // Output PDF
-        $pdf->Output('Invoices_' . date('Y-m-d') . '.pdf', 'I');
     }
 
     /**

@@ -265,7 +265,7 @@
                                     <th class="border-bottom-0">Project Name</th>
                                     <th class="border-bottom-0">Technologies</th>
                                     <th class="border-bottom-0">All Vendors</th>
-                                    <th class="border-bottom-0">All DS</th>
+                                    <th class="border-bottom-0">All D/S</th>
                                     <th class="border-bottom-0">Customer</th>
                                     <th class="border-bottom-0">Customer PO</th>
                                     <th class="border-bottom-0 text-center">Value</th>
@@ -327,12 +327,8 @@
                                         <td>
                                             @if ($project->vendors && $project->vendors->count() > 0)
                                                 @foreach ($project->vendors as $vendor)
-                                                    <span
-                                                        class="badge badge-{{ $vendor->pivot->is_primary ? 'success' : 'secondary' }} badge-custom mr-1">
+                                                    <span class="badge badge-secondary badge-custom mr-1">
                                                         {{ $vendor->vendors }}
-                                                        @if ($vendor->pivot->is_primary)
-                                                            <i class="fas fa-star ml-1" title="Primary"></i>
-                                                        @endif
                                                     </span>
                                                 @endforeach
                                             @else

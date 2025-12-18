@@ -34,7 +34,7 @@ class ProjectsExport implements FromCollection, WithHeadings, WithMapping, WithS
             'Project Name',
             'Technologies',
             'All Vendors',
-            'All DS',
+            'All D/S',
             'Customer',
             'Customer PO',
             'Value',
@@ -69,7 +69,7 @@ class ProjectsExport implements FromCollection, WithHeadings, WithMapping, WithS
             })->implode(', ')
             : 'N/A';
 
-        // Get all DS with lead marker
+        // Get all D/S with lead marker
         $ds = $project->deliverySpecialists && $project->deliverySpecialists->count() > 0
             ? $project->deliverySpecialists->map(function($specialist) {
                 $name = $specialist->dsname;
@@ -183,7 +183,7 @@ class ProjectsExport implements FromCollection, WithHeadings, WithMapping, WithS
             'C' => 25,  // Project Name
             'D' => 15,  // Technologies
             'E' => 20,  // All Vendors
-            'F' => 20,  // All DS
+            'F' => 20,  // All D/S
             'G' => 20,  // Customer
             'H' => 15,  // Customer PO
             'I' => 12,  // Value

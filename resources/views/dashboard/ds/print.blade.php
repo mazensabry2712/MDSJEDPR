@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Delivery Specialists - Print</title>
+    <title>Distributors/Suppliers - Print</title>
     <style>
         * {
             margin: 0;
@@ -117,7 +117,7 @@
 
     <div class="header">
         <div class="system-name">MDSJEDPR</div>
-        <div class="title">Delivery Specialists Management</div>
+        <div class="title">Distributors/Suppliers Management</div>
         <div class="date">Generated: {{ date('m/d/Y, g:i:s A') }}</div>
     </div>
 
@@ -139,7 +139,7 @@
             @empty
                 <tr>
                     <td colspan="3" style="text-align: center; padding: 20px; color: #999;">
-                        No delivery specialists available
+                        No distributors/suppliers available
                     </td>
                 </tr>
             @endforelse

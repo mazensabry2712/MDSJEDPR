@@ -15,7 +15,18 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.3/css/lightbox.min.css" rel="stylesheet">
 
     <style>
-        .customer-header {
+        .img-thumbnail {
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 5px;
+            transition: 0.3s;
+        }
+
+        .img-thumbnail:hover {
+            box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+        }
+
+        .invoice-header {
             background-color: #f8f9fa;
             padding: 20px;
             border-radius: 8px;
@@ -23,23 +34,24 @@
             margin-bottom: 20px;
         }
 
-        .customer-logo {
+        .invoice-attachment {
             width: 120px;
             height: 120px;
+            object-fit: cover;
             border-radius: 8px;
             border: 2px solid #dee2e6;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
 
-        .no-logo {
+        .no-attachment {
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
             width: 120px;
             height: 120px;
-            border-radius: 8px;
-            border: 2px dashed #dee2e6;
-            background-color: #f8f9fa;
+            border: 1px dashed #ccc;
+            border-radius: 4px;
             color: #6c757d;
             font-size: 14px;
             text-align: center;
@@ -109,7 +121,7 @@
             margin-bottom: 15px;
         }
 
-        .type-badge {
+        .status-badge {
             display: inline-block;
             padding: 4px 12px;
             border-radius: 4px;
@@ -119,30 +131,39 @@
             letter-spacing: 0.5px;
         }
 
-        .type-active {
+        .status-active {
             background-color: #28a745;
             color: white;
         }
 
-        .type-pending {
+        .status-pending {
             background-color: #ffc107;
             color: #212529;
         }
 
-        .type-default {
+        .status-completed {
+            background-color: #007bff;
+            color: white;
+        }
+
+        .status-default {
             background-color: #6c757d;
             color: white;
         }
 
-        .customer-name {
+        .invoice-name {
             font-size: 1.8rem;
             font-weight: 700;
-            margin: 0;
-            color: #495057;
+            color: #2c3e50;
+            margin-bottom: 10px;
         }
 
-        .customer-type {
-            margin-top: 10px;
+        .value-badge {
+            background-color: #28a745;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-weight: 600;
         }
 
         .btn {
@@ -150,6 +171,20 @@
         }
 
         .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        .export-buttons {
+            margin-bottom: 20px;
+        }
+
+        .export-buttons .btn {
+            margin: 0 2px;
+            transition: all 0.3s ease;
+        }
+
+        .export-buttons .btn:hover {
             transform: translateY(-2px);
             box-shadow: 0 4px 8px rgba(0,0,0,0.2);
         }
@@ -210,17 +245,21 @@
         }
 
         @media (max-width: 768px) {
-            .customer-header {
+            .invoice-header {
                 text-align: center;
                 padding: 15px;
             }
 
-            .customer-name {
+            .invoice-name {
                 font-size: 1.5rem;
             }
 
             .info-card {
                 padding: 15px;
+            }
+
+            .export-buttons .btn {
+                margin-bottom: 5px;
             }
         }
     </style>
@@ -235,39 +274,25 @@
     <div class="breadcrumb-header justify-content-between">
         <div class="my-auto">
             <div class="d-flex">
-                <h4 class="content-title mb-0 my-auto">Invoice</h4>
-                <span class="text-muted mt-1 tx-13 mr-2 mb-0">/ Details</span>
+                <h4 class="content-title mb-0 my-auto">Invoices</h4>
+                <span class="text-muted mt-1 tx-13 mr-2 mb-0">/ Invoice Details</span>
             </div>
         </div>
         <div class="d-flex my-xl-auto right-content">
-            <!-- Export/Print Buttons -->
-            <div class="btn-group mr-3 mb-3 mb-xl-0" role="group" aria-label="Export Options">
-                <button type="button" class="btn btn-success btn-sm" onclick="exportToPDF()" title="Export to PDF">
-                    <i class="fas fa-file-pdf"></i> PDF
-                </button>
-                <button type="button" class="btn btn-primary btn-sm" onclick="exportToExcel()" title="Export to Excel">
-                    <i class="fas fa-file-excel"></i> Excel
-                </button>
-                {{-- <button type="button" class="btn btn-info btn-sm" onclick="exportToCSV()" title="Export to CSV">
-                    <i class="fas fa-file-csv"></i> CSV
-                </button> --}}
-                <button type="button" class="btn btn-warning btn-sm" onclick="printInvoice()" title="Print">
-                    <i class="fas fa-print"></i> Print
-                </button>
-                <button type="button" class="btn btn-secondary btn-sm" onclick="shareInvoice()" title="Share">
-                    <i class="fas fa-share-alt"></i> Share
+            <div class="pr-1 mb-3 mb-xl-0">
+                <button type="button" class="btn btn-warning btn-icon ml-2 no-print" onclick="window.print();">
+                    <i class="mdi mdi-printer"></i>
                 </button>
             </div>
-
             @can('Edit')
                 <div class="pr-1 mb-3 mb-xl-0">
-                    <a href="{{ route('invoices.edit', $invoice->id) }}" class="btn btn-info btn-icon ml-2">
+                    <a href="{{ route('invoices.edit', $invoice->id) }}" class="btn btn-primary btn-icon ml-2 no-print">
                         <i class="mdi mdi-pencil"></i>
                     </a>
                 </div>
             @endcan
             <div class="pr-1 mb-3 mb-xl-0">
-                <a href="{{ route('invoices.index') }}" class="btn btn-warning btn-icon ml-2">
+                <a href="{{ route('invoices.index') }}" class="btn btn-secondary btn-icon ml-2 no-print">
                     <i class="mdi mdi-arrow-left"></i>
                 </a>
             </div>
@@ -277,6 +302,27 @@
 @endsection
 
 @section('content')
+    <!-- Export Buttons -->
+    <div class="export-buttons text-right mb-3 no-print">
+        <div class="btn-group">
+            <button type="button" class="btn btn-success btn-sm" onclick="exportToPDF()">
+                <i class="fas fa-file-pdf mr-1"></i> PDF
+            </button>
+            <button type="button" class="btn btn-primary btn-sm" onclick="exportToExcel()">
+                <i class="fas fa-file-excel mr-1"></i> Excel
+            </button>
+            {{-- <button type="button" class="btn btn-info btn-sm" onclick="exportToCSV()">
+                <i class="fas fa-file-csv mr-1"></i> CSV
+            </button> --}}
+            <button type="button" class="btn btn-warning btn-sm" onclick="printInvoice()">
+                <i class="fas fa-print mr-1"></i> Print
+            </button>
+            <button type="button" class="btn btn-secondary btn-sm" onclick="shareInvoice()">
+                <i class="fas fa-share mr-1"></i> Share
+            </button>
+        </div>
+    </div>
+
     @if (session()->has('delete'))
         <div class="alert alert-danger alert-dismissible fade show" role="alert">
             <strong>{{ session()->get('delete') }}</strong>
@@ -292,9 +338,10 @@
             <div class="card">
                 <div class="card-body">
                     <!-- Invoice Header -->
-                    <div class="customer-header">
+                    <div class="invoice-header">
                         <div class="row align-items-center">
                             <div class="col-md-2 text-center mb-3 mb-md-0">
+                                <!-- Invoice Copy Attachment -->
                                 @if($invoice->invoice_copy_path)
                                     @php
                                         $filePath = '../storge/' . $invoice->invoice_copy_path;
@@ -303,45 +350,41 @@
                                     @endphp
 
                                     @if($isImage)
-                                        <a href="{{ asset($filePath) }}" data-lightbox="invoice-file" data-title="Invoice Copy - {{ $invoice->invoice_number }}">
-                                            <img src="{{ asset($filePath) }}" alt="Invoice Copy" class="customer-logo">
+                                        <a href="{{ asset($filePath) }}" data-lightbox="gallery-{{ $invoice->id }}"
+                                           data-title="Invoice Copy - {{ $invoice->invoice_number }}" title="Click to view full size">
+                                            <img src="{{ asset($filePath) }}"
+                                                 class="img-thumbnail invoice-attachment"
+                                                 alt="Invoice Copy"
+                                                 title="Invoice Copy - Click to enlarge">
                                         </a>
+                                        <small class="d-block text-primary mt-1">Invoice File</small>
                                     @else
-                                        <div class="no-logo">
-                                            <div>
-                                                <i class="fas fa-file-pdf fa-2x mb-2"></i>
-                                                <div>PDF File</div>
-                                                <a href="{{ asset($filePath) }}" target="_blank" class="btn btn-sm btn-primary mt-2">
-                                                    <i class="fas fa-eye"></i> View
-                                                </a>
-                                            </div>
+                                        <div class="no-attachment">
+                                            <a href="{{ asset($filePath) }}" target="_blank" title="Download Invoice File">
+                                                <i class="fas fa-file-alt text-primary" style="font-size: 40px;"></i>
+                                                <small class="text-primary d-block mt-2">Invoice File</small>
+                                            </a>
                                         </div>
                                     @endif
                                 @else
-                                    <div class="no-logo">
-                                        <div>
-                                            <i class="fas fa-file-times fa-2x mb-2"></i>
-                                            <div>No File</div>
-                                        </div>
+                                    <div class="no-attachment">
+                                        <i class="fas fa-file-alt text-muted" style="font-size: 40px;"></i>
+                                        <small class="text-muted d-block mt-2">No File</small>
                                     </div>
                                 @endif
                             </div>
                             <div class="col-md-10">
-                                <h1 class="customer-name">Invoice #{{ $invoice->invoice_number }}</h1>
-                                <div class="customer-type">
-                                    @if($invoice->status)
-                                        <span class="type-badge type-active">
-                                            {{ $invoice->status }}
-                                        </span>
+                                <h1 class="invoice-name">Invoice #{{ $invoice->invoice_number }}</h1>
+                                <div class="invoice-number">
+                                    @if($invoice->project && $invoice->project->pr_number)
+                                        <span class="badge badge-light" style="font-size: 1rem; padding: 8px 12px;">PR: {{ $invoice->project->pr_number }}</span>
                                     @else
-                                        <span class="type-badge type-default">No Status</span>
+                                        <span class="badge badge-secondary" style="font-size: 1rem; padding: 8px 12px;">No Project Number</span>
                                     @endif
                                 </div>
-                                @if($invoice->project && $invoice->project->pr_number)
+                                @if($invoice->status)
                                     <div class="mt-2">
-                                        <span class="badge badge-light" style="font-size: 1rem; padding: 8px 12px;">
-                                            Project: {{ $invoice->project->pr_number }}
-                                        </span>
+                                        <span class="badge badge-info" style="font-size: 0.9rem; padding: 6px 10px;">{{ $invoice->status }}</span>
                                     </div>
                                 @endif
                             </div>
@@ -687,16 +730,66 @@
 
     <style>
         @media print {
+            /* Hide navigation elements */
             .breadcrumb-header,
             .btn-group,
-            .btn,
-            .info-card:last-child {
+            .export-buttons,
+            .no-print {
                 display: none !important;
             }
 
+            /* Hide buttons inside cards */
+            .btn,
+            button {
+                display: none !important;
+            }
+
+            /* Hide Quick Actions card completely when printing */
+            .info-card:has(.fa-bolt) {
+                display: none !important;
+            }
+
+            /* Clean card appearance */
             .card {
                 box-shadow: none !important;
                 border: 1px solid #ddd !important;
+                page-break-inside: avoid;
+            }
+
+            /* Optimize page layout */
+            body {
+                margin: 0;
+                padding: 10px;
+            }
+
+            /* Ensure invoice header prints nicely */
+            .invoice-header {
+                border: 2px solid #677eea;
+                page-break-inside: avoid;
+            }
+
+            /* Make info cards printer-friendly */
+            .info-card {
+                page-break-inside: avoid;
+                margin-bottom: 15px;
+            }
+
+            .info-item {
+                page-break-inside: avoid;
+            }
+
+            /* Adjust colors for print */
+            .info-icon {
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            /* Ensure badges print with colors */
+            .badge,
+            .type-badge,
+            .value-badge {
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
             }
         }
     </style>

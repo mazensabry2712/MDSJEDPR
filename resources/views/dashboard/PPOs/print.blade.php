@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Project Purchase Orders - Print</title>
+    <title>PPOs - Print</title>
     <style>
         * {
             margin: 0;
@@ -11,216 +11,315 @@
             box-sizing: border-box;
         }
 
+        @page {
+            size: A4 portrait;
+            margin: 10mm;
+        }
+
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            padding: 20px;
+            font-family: 'Helvetica', 'Arial', sans-serif;
+            font-size: 9px;
+            line-height: 1.3;
+            color: #000;
+            background: #fff;
+        }
+
+        .page {
+            width: 210mm;
+            min-height: 297mm;
+            margin: 0 auto;
             background: white;
+            page-break-after: always;
+            position: relative;
+            padding: 10mm;
+        }
+
+        .page-header {
+            text-align: center;
+            margin-bottom: 5mm;
+        }
+
+        .page-header h1 {
+            color: #677eea;
+            font-size: 14px;
+            margin-bottom: 3px;
+        }
+
+        .page-header .date {
+            color: #787878;
+            font-size: 8px;
+        }
+
+        .page-footer {
+            position: absolute;
+            bottom: 5mm;
+            left: 0;
+            right: 0;
+            text-align: center;
+            color: #677eea;
+            font-weight: bold;
+            font-size: 9px;
+        }
+
+        .card {
+            width: 190mm;
+            height: 64mm;
+            border: 1.5px solid #677eea;
+            border-radius: 3px;
+            margin-bottom: 1.5mm;
+            page-break-inside: avoid;
+            background: white;
+            position: relative;
+        }
+
+        .card-header {
+            background: #677eea;
+            color: white;
+            padding: 1.5mm 3mm;
+            border-radius: 3px 3px 0 0;
+            height: 8mm;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .card-header .po-number {
+            font-weight: bold;
+            font-size: 9px;
+        }
+
+        .card-header .ppo-index {
+            font-size: 7px;
+        }
+
+        .card-body {
+            padding: 2mm 5mm;
+        }
+
+        .columns {
+            display: flex;
+            gap: 2mm;
+        }
+
+        .column {
+            flex: 1;
+        }
+
+        .field {
+            margin-bottom: 1.5mm;
+            font-size: 8px;
+        }
+
+        .field-label {
+            font-weight: bold;
+            color: #505050;
+            display: inline-block;
+            min-width: 40mm;
+        }
+
+        .field-value {
+            color: #000;
+            display: inline-block;
+        }
+
+        .field-value.value-amount {
+            color: #008000;
+            font-weight: bold;
         }
 
         .print-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 10px 20px;
             background-color: #677EEA;
             color: white;
             border: none;
-            padding: 10px 20px;
             border-radius: 5px;
             cursor: pointer;
             font-size: 14px;
-            margin-bottom: 20px;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            z-index: 1000;
         }
 
         .print-btn:hover {
-            background-color: #5568d3;
-        }
-
-        .header {
-            text-align: center;
-            margin-bottom: 30px;
-            padding-bottom: 20px;
-            border-bottom: 3px solid #677EEA;
-        }
-
-        .system-name {
-            color: #677EEA;
-            font-size: 28px;
-            font-weight: bold;
-            margin-bottom: 10px;
-        }
-
-        .title {
-            font-size: 20px;
-            color: #333;
-            margin-bottom: 8px;
-        }
-
-        .date {
-            color: #666;
-            font-size: 14px;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-            font-size: 12px;
-        }
-
-        th {
-            background-color: #677EEA;
-            color: white;
-            padding: 10px 8px;
-            text-align: left;
-            font-weight: 600;
-            border: 1px solid #5568d3;
-        }
-
-        th:first-child {
-            text-align: center;
-            width: 40px;
-        }
-
-        td {
-            padding: 8px;
-            border: 1px solid #ddd;
-        }
-
-        td:first-child {
-            text-align: center;
-            font-weight: 600;
-            color: #677EEA;
-        }
-
-        tr:nth-child(even) {
-            background-color: #f9f9f9;
-        }
-
-        tr:hover {
-            background-color: #f0f0f0;
-        }
-
-        .value-cell {
-            text-align: right;
-            font-weight: 600;
-            color: #28a745;
-        }
-
-        .date-cell {
-            text-align: center;
-            color: #666;
-        }
-
-        .text-truncate {
-            max-width: 150px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
+            background-color: #5668d3;
         }
 
         @media print {
+            body {
+                margin: 0;
+                padding: 0;
+            }
+
+            .page {
+                margin: 0;
+                width: 210mm;
+                height: 297mm;
+                padding: 10mm;
+            }
+
+            .card {
+                page-break-inside: avoid;
+            }
+
+            .page:last-child {
+                page-break-after: avoid;
+            }
+
             .print-btn {
                 display: none;
             }
 
-            body {
-                padding: 10px;
+            .no-print {
+                display: none;
             }
 
-            table {
-                page-break-inside: auto;
-                font-size: 10px;
+            @page {
+                size: A4 portrait;
+                margin: 0;
             }
 
-            tr {
-                page-break-inside: avoid;
-                page-break-after: auto;
-            }
-
-            th, td {
-                padding: 6px 4px;
+            /* Hide scrollbars */
+            * {
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
             }
         }
 
-        @page {
-            size: landscape;
-            margin: 15mm;
+        @media screen {
+            body {
+                background: #f5f5f5;
+                padding: 20px;
+            }
+
+            .page {
+                box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+                margin-bottom: 20px;
+            }
         }
     </style>
 </head>
 <body>
-    <button onclick="window.print()" class="print-btn no-print">
-        🖨️ Print
-    </button>
 
-    <div class="header">
-        <div class="system-name">MDSJEDPR</div>
-        <div class="title">Project Purchase Orders Management</div>
-        <div class="date">Generated: {{ date('m/d/Y, g:i:s A') }}</div>
+<button onclick="window.print()" class="print-btn no-print">🖨️ Print</button>
+
+<script>
+    // Auto-trigger print when page loads
+    window.addEventListener('load', function() {
+        // Small delay to ensure page is fully rendered
+        setTimeout(function() {
+            window.print();
+        }, 500);
+    });
+
+    // Close window after printing or canceling
+    window.addEventListener('afterprint', function() {
+        window.close();
+    });
+
+    // Fallback: if window can't close (opened directly), show message
+    setTimeout(function() {
+        if (!window.opener && document.visibilityState === 'visible') {
+            console.log('Print dialog closed. You can close this tab manually.');
+        }
+    }, 5000);
+</script>
+
+@php
+    $chunked = $ppos->chunk(4);
+@endphp
+
+@foreach($chunked as $pageIndex => $pagePPOs)
+<div class="page">
+    <!-- Page Header -->
+    <div class="page-header">
+        <h1>PPOs Report</h1>
+        <div class="date">Generated: {{ date('d/m/Y g:i A') }}</div>
     </div>
 
-    <table>
-        <thead>
-            <tr>
-                <th>#</th>
-                <th>PR Number</th>
-                <th>Project Name</th>
-                <th>Category</th>
-                <th>Supplier</th>
-                <th>PO Number</th>
-                <th>Value</th>
-                <th>Date</th>
-                <th>Status</th>
-                <th>Updates</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach ($ppos as $index => $item)
-                <tr>
-                    <td>{{ $index + 1 }}</td>
-                    <td>{{ $item->project->pr_number ?? 'N/A' }}</td>
-                    <td class="text-truncate" title="{{ $item->project->name ?? 'N/A' }}">
-                        {{ $item->project->name ?? 'N/A' }}
-                    </td>
-                    <td>
-                        @php
-                            $allCategories = \App\Models\Ppos::where('po_number', $item->po_number)
-                                ->with('pepo:id,category')
-                                ->get()
-                                ->pluck('pepo.category')
-                                ->filter()
-                                ->unique()
-                                ->implode(', ');
-                        @endphp
-                        {{ $allCategories ?: 'N/A' }}
-                    </td>
-                    <td>{{ $item->ds->dsname ?? 'N/A' }}</td>
-                    <td>{{ $item->po_number ?? 'N/A' }}</td>
-                    <td class="value-cell">
-                        @if($item->value)
-                            ${{ number_format($item->value, 2) }}
-                        @else
-                            N/A
-                        @endif
-                    </td>
-                    <td class="date-cell">{{ $item->date ? $item->date->format('Y-m-d') : 'N/A' }}</td>
-                    <td class="text-truncate" title="{{ $item->status ?? 'N/A' }}">
-                        {{ $item->status ?? 'N/A' }}
-                    </td>
-                    <td class="text-truncate" title="{{ $item->updates ?? 'No updates' }}">
-                        {{ $item->updates ?? 'No updates' }}
-                    </td>
-                </tr>
-            @endforeach
-        </tbody>
-    </table>
+    <!-- Cards -->
+    @foreach($pagePPOs as $index => $ppo)
+    @php
+        $globalIndex = ($pageIndex * 4) + $loop->iteration;
+        // Get all categories for this PO Number
+        $allCategories = \App\Models\Ppos::where('po_number', $ppo->po_number)
+            ->with('pepo:id,category')
+            ->get()
+            ->pluck('pepo.category')
+            ->filter()
+            ->unique()
+            ->implode(', ');
+    @endphp
 
-    <script>
-        window.onload = function() {
-            setTimeout(function() {
-                window.print();
-            }, 500);
-        }
-    </script>
+    <div class="card">
+        <!-- Card Header -->
+        <div class="card-header">
+            <span class="po-number">PO: {{ $ppo->po_number ?? 'N/A' }}</span>
+            <span class="ppo-index">PPO #{{ $globalIndex }}</span>
+        </div>
+
+        <!-- Card Body -->
+        <div class="card-body">
+            <div class="columns">
+                <!-- Left Column -->
+                <div class="column">
+                    <div class="field">
+                        <span class="field-label">PR Number:</span>
+                        <span class="field-value">{{ $ppo->project->pr_number ?? 'N/A' }}</span>
+                    </div>
+                    <div class="field">
+                        <span class="field-label">Project Name:</span>
+                        <span class="field-value">{{ Str::limit($ppo->project->name ?? 'N/A', 35) }}</span>
+                    </div>
+                    <div class="field">
+                        <span class="field-label">Category:</span>
+                        <span class="field-value">{{ Str::limit($allCategories ?: 'N/A', 35) }}</span>
+                    </div>
+                    <div class="field">
+                        <span class="field-label">Supplier:</span>
+                        <span class="field-value">{{ $ppo->ds->dsname ?? 'N/A' }}</span>
+                    </div>
+                    <div class="field">
+                        <span class="field-label">Updates:</span>
+                        <span class="field-value">{{ Str::limit($ppo->updates ?? 'No updates', 35) }}</span>
+                    </div>
+                </div>
+
+                <!-- Right Column -->
+                <div class="column">
+                    <div class="field">
+                        <span class="field-label">PO Number:</span>
+                        <span class="field-value">{{ $ppo->po_number ?? 'N/A' }}</span>
+                    </div>
+                    <div class="field">
+                        <span class="field-label">Value:</span>
+                        <span class="field-value value-amount">{{ $ppo->value ? '$' . number_format($ppo->value, 2) : 'N/A' }}</span>
+                    </div>
+                    <div class="field">
+                        <span class="field-label">Date:</span>
+                        <span class="field-value">{{ $ppo->date ? $ppo->date->format('d/m/Y') : 'N/A' }}</span>
+                    </div>
+                    <div class="field">
+                        <span class="field-label">Status:</span>
+                        <span class="field-value">{{ Str::limit($ppo->status ?? 'N/A', 25) }}</span>
+                    </div>
+                    <div class="field">
+                        <span class="field-label">Notes:</span>
+                        <span class="field-value">{{ Str::limit($ppo->notes ?? 'No notes', 25) }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    @endforeach
+
+    <!-- Page Footer -->
+    <div class="page-footer">
+        MDSJEDPR
+    </div>
+</div>
+@endforeach
+
 </body>
 </html>

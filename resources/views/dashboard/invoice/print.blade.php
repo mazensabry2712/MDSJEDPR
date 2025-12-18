@@ -11,63 +11,124 @@
             box-sizing: border-box;
         }
 
+        @page {
+            size: A4 portrait;
+            margin: 10mm;
+        }
+
         body {
-            font-family: Arial, sans-serif;
-            padding: 20px;
+            font-family: 'Helvetica', 'Arial', sans-serif;
+            font-size: 9px;
+            line-height: 1.3;
+            color: #000;
+            background: #fff;
         }
 
-        .header {
+        .page {
+            width: 210mm;
+            min-height: 297mm;
+            margin: 0 auto;
+            background: white;
+            page-break-after: always;
+            position: relative;
+            padding: 10mm;
+        }
+
+        .page-header {
             text-align: center;
-            margin-bottom: 30px;
-            border-bottom: 3px solid #677EEA;
-            padding-bottom: 15px;
+            margin-bottom: 5mm;
         }
 
-        .system-name {
-            font-size: 24px;
+        .page-header h1 {
+            color: #677eea;
+            font-size: 14px;
+            margin-bottom: 3px;
+        }
+
+        .page-header .date {
+            color: #787878;
+            font-size: 8px;
+        }
+
+        .page-footer {
+            position: absolute;
+            bottom: 5mm;
+            left: 0;
+            right: 0;
+            text-align: center;
+            color: #677eea;
             font-weight: bold;
-            color: #677EEA;
-            margin-bottom: 5px;
+            font-size: 9px;
         }
 
-        .title {
-            font-size: 18px;
-            color: #333;
-            margin-bottom: 5px;
+        .card {
+            width: 190mm;
+            height: 52mm;
+            border: 1.5px solid #677eea;
+            border-radius: 3px;
+            margin-bottom: 1.5mm;
+            page-break-inside: avoid;
+            background: white;
+            position: relative;
         }
 
-        .date {
-            font-size: 12px;
-            color: #666;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-            font-size: 11px;
-        }
-
-        th {
-            background-color: #677EEA;
+        .card-header {
+            background: #677eea;
             color: white;
-            padding: 10px 8px;
-            text-align: left;
-            border: 1px solid #ddd;
+            padding: 1.5mm 3mm;
+            border-radius: 3px 3px 0 0;
+            height: 8mm;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .card-header .invoice-number {
+            font-weight: bold;
+            font-size: 9px;
+        }
+
+        .card-header .invoice-index {
+            font-size: 7px;
+        }
+
+        .card-body {
+            padding: 2mm 5mm;
+        }
+
+        .columns {
+            display: flex;
+            gap: 2mm;
+        }
+
+        .column {
+            flex: 1;
+        }
+
+        .field {
+            margin-bottom: 1.5mm;
+            font-size: 8px;
+        }
+
+        .field-label {
+            font-weight: bold;
+            color: #505050;
+            display: inline-block;
+            min-width: 40mm;
+        }
+
+        .field-value {
+            color: #000;
+            display: inline-block;
+        }
+
+        .field-value.value-amount {
+            color: #008000;
             font-weight: bold;
         }
 
-        td {
-            padding: 8px;
-            border: 1px solid #ddd;
-        }
-
-        tr:nth-child(even) {
-            background-color: #f5f5f5;
-        }
-
-        tr:hover {
-            background-color: #e8f4f8;
+        .field-value.value-total {
+            color: #000080;
         }
 
         .print-btn {
@@ -82,53 +143,32 @@
             cursor: pointer;
             font-size: 14px;
             box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            z-index: 1000;
         }
 
         .print-btn:hover {
             background-color: #5668d3;
         }
 
-        .badge {
-            padding: 4px 8px;
-            border-radius: 3px;
-            font-size: 11px;
-            font-weight: bold;
-        }
-
-        .badge-success {
-            background-color: #28a745;
-            color: white;
-        }
-
-        .badge-warning {
-            background-color: #ffc107;
-            color: #333;
-        }
-
-        .badge-danger {
-            background-color: #dc3545;
-            color: white;
-        }
-
-        .badge-info {
-            background-color: #17a2b8;
-            color: white;
-        }
-
-        .badge-secondary {
-            background-color: #6c757d;
-            color: white;
-        }
-
-        .badge-primary {
-            background-color: #007bff;
-            color: white;
-        }
-
         @media print {
             body {
                 margin: 0;
-                padding: 10px;
+                padding: 0;
+            }
+
+            .page {
+                margin: 0;
+                width: 210mm;
+                height: 297mm;
+                padding: 10mm;
+            }
+
+            .card {
+                page-break-inside: avoid;
+            }
+
+            .page:last-child {
+                page-break-after: avoid;
             }
 
             .print-btn {
@@ -139,84 +179,136 @@
                 display: none;
             }
 
-            table {
-                page-break-inside: auto;
+            @page {
+                size: A4 portrait;
+                margin: 0;
             }
 
-            tr {
-                page-break-inside: avoid;
-                page-break-after: auto;
+            /* Hide scrollbars */
+            * {
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+        }
+
+        @media screen {
+            body {
+                background: #f5f5f5;
+                padding: 20px;
+            }
+
+            .page {
+                box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+                margin-bottom: 20px;
             }
         }
     </style>
 </head>
 <body>
-    <button onclick="window.print()" class="print-btn no-print">🖨️ Print</button>
 
-    <div class="header">
-        <div class="system-name">MDSJEDPR</div>
-        <div class="title">Invoices Management</div>
-        <div class="date">Generated: {{ date('m/d/Y, g:i:s A') }}</div>
+<button onclick="window.print()" class="print-btn no-print">🖨️ Print</button>
+
+<script>
+    // Auto-trigger print when page loads
+    window.addEventListener('load', function() {
+        // Small delay to ensure page is fully rendered
+window.print();
+        }, 500);
+    });
+
+    // Close window after printing or canceling
+    window.addEventListener('afterprint', function() {
+        window.close();
+    });
+
+    // Fallback: if window can't close (opened directly), show message
+    setTimeout(function() {
+        if (!window.opener && document.visibilityState === 'visible') {
+            console.log('Print dialog closed. You can close this tab manually.');
+        }
+    }, 5000);
+</script>
+
+@php
+    $chunked = $invoices->chunk(5);
+@endphp
+
+@foreach($chunked as $pageIndex => $pageInvoices)
+<div class="page">
+    <!-- Page Header -->
+    <div class="page-header">
+        <h1>Invoices Report</h1>
+        <div class="date">Generated: {{ date('d/m/Y g:i A') }}</div>
     </div>
 
-    <table>
-        <thead>
-            <tr>
-                <th>#</th>
-                <th>PR Number</th>
-                <th>Project Name</th>
-                <th>Invoice Number</th>
-                <th>Value</th>
-                <th>PR Total Value</th>
-                <th>Project Value</th>
-                <th>Status</th>
-            </tr>
-        </thead>
-        <tbody>
-            @forelse($invoices as $index => $invoice)
-                <tr>
-                    <td>{{ $index + 1 }}</td>
-                    <td>{{ $invoice->project->pr_number ?? 'N/A' }}</td>
-                    <td>{{ $invoice->project->name ?? 'N/A' }}</td>
-                    <td>{{ $invoice->invoice_number }}</td>
-                    <td>{{ number_format($invoice->value, 2) }} SAR</td>
-                    <td>{{ number_format($invoice->pr_invoices_total_value, 2) }} SAR</td>
-                    <td>{{ number_format($invoice->project->value ?? 0, 2) }} SAR</td>
-                    <td>
-                        @php
-                            $statusLower = strtolower($invoice->status);
-                            $badgeClass = 'badge-primary';
+    <!-- Cards -->
+    @foreach($pageInvoices as $index => $invoice)
+    @php
+        $globalIndex = ($pageIndex * 5) + $loop->iteration;
+    @endphp
 
-                            if (str_contains($statusLower, 'paid') || str_contains($statusLower, 'complete')) {
-                                $badgeClass = 'badge-success';
-                            } elseif (str_contains($statusLower, 'pending') || str_contains($statusLower, 'waiting') || str_contains($statusLower, 'processing')) {
-                                $badgeClass = 'badge-warning';
-                            } elseif (str_contains($statusLower, 'overdue') || str_contains($statusLower, 'late')) {
-                                $badgeClass = 'badge-danger';
-                            } elseif (str_contains($statusLower, 'cancel') || str_contains($statusLower, 'reject')) {
-                                $badgeClass = 'badge-secondary';
-                            }
-                        @endphp
-                        <span class="badge {{ $badgeClass }}">{{ $invoice->status }}</span>
-                    </td>
-                </tr>
-            @empty
-                <tr>
-                    <td colspan="8" style="text-align: center; padding: 20px; color: #999;">
-                        No invoices available
-                    </td>
-                </tr>
-            @endforelse
-        </tbody>
-    </table>
+    <div class="card">
+        <!-- Card Header -->
+        <div class="card-header">
+            <span class="invoice-number">Invoice: {{ $invoice->invoice_number ?? 'N/A' }}</span>
+            <span class="invoice-index">Invoice #{{ $globalIndex }}</span>
+        </div>
 
-    <script>
-        // Auto-print when page loads
-        window.onload = function() {
-            setTimeout(function() {
-                window.print();
-            }, 500);
-        }
-    </script>
+        <!-- Card Body -->
+        <div class="card-body">
+            <div class="columns">
+                <!-- Left Column -->
+                <div class="column">
+                    <div class="field">
+                        <span class="field-label">Invoice Number:</span>
+                        <span class="field-value">{{ $invoice->invoice_number ?? 'N/A' }}</span>
+                    </div>
+                    <div class="field">
+                        <span class="field-label">PR Number:</span>
+                        <span class="field-value">{{ $invoice->project->pr_number ?? 'N/A' }}</span>
+                    </div>
+                    <div class="field">
+                        <span class="field-label">Project Name:</span>
+                        <span class="field-value">{{ Str::limit($invoice->project->name ?? 'N/A', 35) }}</span>
+                    </div>
+                    <div class="field">
+                        <span class="field-label">Invoice Value:</span>
+                        <span class="field-value value-amount">{{ $invoice->value ? number_format($invoice->value, 2) . ' SAR' : 'N/A' }}</span>
+                    </div>
+                </div>
+
+                <!-- Right Column -->
+                <div class="column">
+                    <div class="field">
+                        <span class="field-label">PR Invoices Total:</span>
+                        <span class="field-value value-total">
+                            {{ number_format($invoice->pr_invoices_total_value, 2) }}
+                            @if($invoice->project && $invoice->project->value)
+                                of {{ number_format($invoice->project->value, 2) }}
+                            @endif
+                            SAR
+                        </span>
+                    </div>
+                    <div class="field">
+                        <span class="field-label">Status:</span>
+                        <span class="field-value">{{ $invoice->status ?? 'N/A' }}</span>
+                    </div>
+                    <div class="field">
+                        <span class="field-label">Created Date:</span>
+                        <span class="field-value">{{ $invoice->created_at ? $invoice->created_at->format('d/m/Y') : 'N/A' }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    @endforeach
+
+    <!-- Page Footer -->
+    <div class="page-footer">
+        MDSJEDPR
+    </div>
+</div>
+@endforeach
+
 </body>
 </html>

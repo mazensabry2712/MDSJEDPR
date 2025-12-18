@@ -345,7 +345,7 @@ class ProjectsController extends Controller
 
                 $project->deliverySpecialists()->attach($dsId, [
                     'is_lead' => $isLead,
-                    'responsibility' => $isLead ? 'Lead Delivery Specialist' : 'Support Specialist',
+                    'responsibility' => $isLead ? 'Lead Distributor/Supplier' : 'Support Distributor/Supplier',
                     'allocation_percentage' => $allocationPercentage,
                     'assigned_date' => $project->customer_po_date ?? now(),
                     'notes' => null
@@ -357,7 +357,7 @@ class ProjectsController extends Controller
         if ((!$request->has('customers') || empty($request->customers)) && $project->cust_id) {
             $project->customers()->attach($project->cust_id, [
                 'is_primary' => true,
-                'role' => 'Primary Customer',
+                'role' => 'Customer',
                 'notes' => null
             ]);
         }
@@ -365,7 +365,7 @@ class ProjectsController extends Controller
         if ((!$request->has('vendors') || empty($request->vendors)) && $project->vendors_id) {
             $project->vendors()->attach($project->vendors_id, [
                 'is_primary' => true,
-                'service_type' => 'Primary Service',
+                'service_type' => 'Service',
                 'contract_value' => $project->value,
                 'start_date' => $project->customer_po_date,
                 'end_date' => $project->customer_po_deadline,
@@ -376,7 +376,7 @@ class ProjectsController extends Controller
         if ((!$request->has('delivery_specialists') || empty($request->delivery_specialists)) && $project->ds_id) {
             $project->deliverySpecialists()->attach($project->ds_id, [
                 'is_lead' => true,
-                'responsibility' => 'Lead Delivery Specialist',
+                'responsibility' => 'Distributor/Supplier',
                 'allocation_percentage' => 100.00,
                 'assigned_date' => $project->customer_po_date ?? now(),
                 'notes' => null
@@ -499,15 +499,6 @@ class ProjectsController extends Controller
                 $pdf->SetTextColor(0, 0, 0);
                 $pdf->MultiCell($valueWidth, $lineHeight, $project->technologies ?? 'N/A', 0, 'L', false, 1);
 
-                // Primary Vendor
-                $pdf->SetXY($leftX, $pdf->GetY());
-                $pdf->SetFont('helvetica', 'B', 6);
-                $pdf->SetTextColor(80, 80, 80);
-                $pdf->Cell($labelWidth, $lineHeight, 'Primary Vendor:', 0, 0, 'L');
-                $pdf->SetFont('helvetica', '', 6);
-                $pdf->SetTextColor(0, 0, 0);
-                $pdf->MultiCell($valueWidth, $lineHeight, optional($project->vendor)->vendors ?? 'N/A', 0, 'L', false, 1);
-
                 // All Vendors
                 $pdf->SetXY($leftX, $pdf->GetY());
                 $pdf->SetFont('helvetica', 'B', 6);
@@ -516,15 +507,6 @@ class ProjectsController extends Controller
                 $pdf->SetFont('helvetica', '', 6);
                 $pdf->SetTextColor(0, 0, 0);
                 $pdf->MultiCell($valueWidth, $lineHeight, $allVendors, 0, 'L', false, 1);
-
-                // Primary Customer
-                $pdf->SetXY($leftX, $pdf->GetY());
-                $pdf->SetFont('helvetica', 'B', 6);
-                $pdf->SetTextColor(80, 80, 80);
-                $pdf->Cell($labelWidth, $lineHeight, 'Primary Customer:', 0, 0, 'L');
-                $pdf->SetFont('helvetica', '', 6);
-                $pdf->SetTextColor(0, 0, 0);
-                $pdf->MultiCell($valueWidth, $lineHeight, optional($project->cust)->name ?? 'N/A', 0, 'L', false, 1);
 
                 // All Customers
                 $pdf->SetXY($leftX, $pdf->GetY());
@@ -565,20 +547,11 @@ class ProjectsController extends Controller
                 $pdf->SetTextColor(0, 0, 0);
                 $pdf->MultiCell($valueWidth, $lineHeight, optional($project->ppms)->name ?? 'N/A', 0, 'L', false, 1);
 
-                // Primary DS
+                // All D/S
                 $pdf->SetXY($middleX, $pdf->GetY());
                 $pdf->SetFont('helvetica', 'B', 6);
                 $pdf->SetTextColor(80, 80, 80);
-                $pdf->Cell($labelWidth, $lineHeight, 'Primary DS:', 0, 0, 'L');
-                $pdf->SetFont('helvetica', '', 6);
-                $pdf->SetTextColor(0, 0, 0);
-                $pdf->MultiCell($valueWidth, $lineHeight, optional($project->ds)->dsname ?? 'N/A', 0, 'L', false, 1);
-
-                // All DS
-                $pdf->SetXY($middleX, $pdf->GetY());
-                $pdf->SetFont('helvetica', 'B', 6);
-                $pdf->SetTextColor(80, 80, 80);
-                $pdf->Cell($labelWidth, $lineHeight, 'All DS:', 0, 0, 'L');
+                $pdf->Cell($labelWidth, $lineHeight, 'All D/S:', 0, 0, 'L');
                 $pdf->SetFont('helvetica', '', 6);
                 $pdf->SetTextColor(0, 0, 0);
                 $pdf->MultiCell($valueWidth, $lineHeight, $allDS, 0, 'L', false, 1);
@@ -616,11 +589,13 @@ class ProjectsController extends Controller
                 $pdf->SetXY(15, $descY);
                 $pdf->SetFont('helvetica', 'B', 6);
                 $pdf->SetTextColor(80, 80, 80);
-                $pdf->Cell(30, $lineHeight, 'Description:', 0, 0, 'L');
+                $pdf->Cell(30, $lineHeight, 'Description:', 0, 1, 'L');
+
+                // Move to value position (same X as label start)
+                $pdf->SetXY(15, $pdf->GetY());
                 $pdf->SetFont('helvetica', '', 6);
                 $pdf->SetTextColor(0, 0, 0);
-                $pdf->MultiCell(160, $lineHeight, substr($project->description ?? 'N/A', 0, 100), 0, 'L', false, 1);
-
+                $pdf->MultiCell(180, 4, $project->description ?? 'N/A', 0, 'L', false, 1);
                 // Move to next card position - 5 cards per page
                 $pdf->SetY($cardY + 53.5); // Tight spacing for 5 cards
                 $cardCount++;

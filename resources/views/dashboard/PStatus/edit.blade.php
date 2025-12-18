@@ -67,20 +67,12 @@
 
                         <div class="row mt-3">
                             <div class="col">
-                                <label for="pr_number" class="control-label">PR Number: <span class="tx-danger">*</span></label>
-                                <select name="pr_number" id="pr_number" class="form-control SlectBox" required>
-                                    <option value="">Choose PR Number</option>
-                                    @foreach ($projects as $project)
-                                        {{-- ⬅️ تم إضافة بيانات مدير المشروع هنا --}}
-                                        <option value="{{ $project->id }}"
-                                            data-project-name="{{ $project->name }}"
-                                            data-pm-id="{{ $project->ppms_id }}"
-                                            data-pm-name="{{ $project->ppms->name ?? 'N/A' }}"
-                                            {{ (old('pr_number', $pstatus->pr_number) == $project->id) ? 'selected' : '' }}>
-                                            {{ $project->pr_number }}
-                                        </option>
-                                    @endforeach
-                                </select>
+                                <label for="pr_number_display" class="control-label">PR Number: <span class="tx-danger">*</span></label>
+                                <input type="text" id="pr_number_display" class="form-control" readonly
+                                    style="background-color: #f8f9fa; cursor: not-allowed;"
+                                    value="{{ $pstatus->project->pr_number ?? '' }}">
+                                <input type="hidden" name="pr_number" value="{{ $pstatus->pr_number }}">
+                                <small class="text-muted">PR Number cannot be changed after creation.</small>
                             </div>
 
                             <div class="col">
@@ -175,40 +167,9 @@
     <script src="{{ URL::asset('assets/js/select2.js') }}"></script>
 
     <script>
-        // دالة لتعبئة بيانات المشروع واسم مدير المشروع
-        function autoFillProjectDetails() {
-            const selectedOption = $('#pr_number').find('option:selected');
-            const projectName = selectedOption.data('project-name');
-            const pmId = selectedOption.data('pm-id');
-            const pmName = selectedOption.data('pm-name');
-
-            // تعبئة Project Name
-            if (projectName) {
-                $('#project_name_display').val(projectName).css('color', '#495057');
-            } else {
-                $('#project_name_display').val('No project name available').css('color', '#6c757d');
-            }
-
-            // تعبئة PM Name
-            if (pmName && pmId) {
-                $('#pm_name_display').val(pmName).css('color', '#495057');
-                // تحديث الحقل المخفي الذي سيتم إرساله في النموذج
-                $('#pm_name_id').val(pmId);
-            } else {
-                $('#pm_name_display').val('No PM assigned to this project').css('color', '#dc3545');
-                $('#pm_name_id').val('');
-            }
-        }
-
         $(document).ready(function() {
-            // ملاحظة: لا حاجة لـ setDateTimeLocal() هنا لأننا نستخدم القيمة المخزنة
-            // ولكن يجب التأكد من تعبئة حقول المشروع عند التحميل:
-            autoFillProjectDetails();
-
-            // Auto-fill project name when PR Number changes
-            $('#pr_number').on('change', function() {
-                autoFillProjectDetails();
-            });
+            // PR Number is now readonly, no change events needed
+            console.log('✅ PStatus Edit page loaded - PR Number is locked');
         });
     </script>
 @endsection

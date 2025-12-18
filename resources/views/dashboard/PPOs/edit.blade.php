@@ -100,11 +100,11 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label for="category" class="form-label">Categories: <span class="tx-danger">*</span></label>
-                                    <select class="form-control select2" id="category" name="category[]" multiple required>
-                                        <option value="">Loading...</option>
+                                    <label for="category" class="form-label">Category: <span class="tx-danger">*</span></label>
+                                    <select class="form-control select2" id="category" name="category" required>
+                                        <option value="" disabled selected>Loading...</option>
                                     </select>
-                                    <small class="text-muted">You can select multiple categories after selecting PR Number</small>
+                                    <small class="text-muted">Select category after selecting PR Number</small>
                                 </div>
                             </div>
                         </div>
@@ -267,12 +267,11 @@
                             $('#category').html(options);
                             $('#category').prop('disabled', false);
 
-                            // Re-initialize Select2 with multiple selection support
+                            // Re-initialize Select2 with single selection
                             if (typeof $.fn.select2 !== 'undefined') {
                                 $('#category').select2({
-                                    placeholder: 'Choose one or more categories',
+                                    placeholder: 'Choose a category',
                                     allowClear: true,
-                                    closeOnSelect: false,
                                     width: '100%'
                                 });
                             }

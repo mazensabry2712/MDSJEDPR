@@ -138,8 +138,7 @@ class PposController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'pr_number' => 'required|exists:projects,id',
-            'category' => 'required|array',
-            'category.*' => 'required|exists:pepos,id',
+            'category' => 'required|exists:pepos,id',
             'dsname' => 'required|exists:ds,id',
             'po_number' => 'required|string|max:255|unique:ppos,po_number,' . $ppo->id,
             'value' => 'nullable|numeric|min:0',
@@ -156,12 +155,10 @@ class PposController extends Controller
         }
 
         try {
-            $categories = $request->input('category');
-
-            // Update the current record with the first category
+            // Update the current record (single category in edit mode)
             $ppo->update([
                 'pr_number' => $request->pr_number,
-                'category' => $categories[0], // First category
+                'category' => $request->category,
                 'dsname' => $request->dsname,
                 'po_number' => $request->po_number,
                 'value' => $request->value,
@@ -171,34 +168,11 @@ class PposController extends Controller
                 'notes' => $request->notes,
             ]);
 
-            // Create additional records for remaining categories
-            for ($i = 1; $i < count($categories); $i++) {
-                Ppos::create([
-                    'pr_number' => $request->pr_number,
-                    'category' => $categories[$i],
-                    'dsname' => $request->dsname,
-                    'po_number' => $request->po_number,
-                    'value' => $request->value,
-                    'date' => $request->date,
-                    'status' => $request->status,
-                    'updates' => $request->updates,
-                    'notes' => $request->notes,
-                ]);
-            }
-
             // مسح الـ Cache بعد التحديث
             Cache::forget('ppos_list');
 
-            $totalRecords = count($categories);
-            $newRecords = $totalRecords - 1;
-
-            $message = 'PPO has been updated successfully';
-            if ($newRecords > 0) {
-                $message .= " and {$newRecords} additional record(s) created for other categories";
-            }
-
             return redirect()->route('ppos.index')
-                ->with('Edit', $message);
+                ->with('Edit', 'PPO has been updated successfully');
         } catch (\Exception $e) {
             return redirect()->back()
                 ->with('Error', 'Failed to update PPO: ' . $e->getMessage())
@@ -249,105 +223,246 @@ class PposController extends Controller
     }
 
     /**
-     * Export PPOs to PDF
+     * Export PPOs to PDF - Card Layout
      */
     public function exportPDF()
     {
-        $ppos = Ppos::with(['project:id,pr_number,name', 'pepo:id,category', 'ds:id,dsname'])
-            ->get();
+        try {
+            $ppos = Ppos::with(['project:id,pr_number,name', 'pepo:id,category', 'ds:id,dsname'])->get();
 
-        $pdf = new \TCPDF('L', 'mm', 'A4', true, 'UTF-8', false);
+            $pdf = new \TCPDF('P', 'mm', 'A4', true, 'UTF-8', false);
 
-        // Set document information
-        $pdf->SetCreator('MDSJEDPR');
-        $pdf->SetAuthor('MDSJEDPR');
-        $pdf->SetTitle('Project Purchase Orders');
-        $pdf->SetSubject('PPOs List');
+            // Set document information
+            $pdf->SetCreator('MDS JED Project System');
+            $pdf->SetAuthor('Corporate Sites Management System');
+            $pdf->SetTitle('PPOs Report');
+            $pdf->SetSubject('PPOs Export - Card View');
 
-        // Remove default header/footer
-        $pdf->setPrintHeader(false);
-        $pdf->setPrintFooter(false);
+            // Remove default header/footer
+            $pdf->setPrintHeader(false);
+            $pdf->setPrintFooter(false);
 
-        // Set margins
-        $pdf->SetMargins(10, 10, 10);
-        $pdf->SetAutoPageBreak(TRUE, 10);
+            // Set margins for A4
+            $pdf->SetMargins(10, 10, 10);
+            $pdf->SetAutoPageBreak(false);
 
-        // Add a page
-        $pdf->AddPage();
+            // Set font
+            $pdf->SetFont('helvetica', '', 9);
 
-        // Add system name at top
-        $pdf->SetFont('helvetica', 'B', 16);
-        $pdf->SetTextColor(103, 126, 234); // #677EEA
-        $pdf->Cell(0, 10, 'MDSJEDPR', 0, 1, 'C');
+            $cardCount = 0;
+            $cardsPerPage = 4;
+            $cardHeight = 64;
+            $cardGap = 2;
 
-        // Add title
-        $pdf->SetFont('helvetica', 'B', 14);
-        $pdf->SetTextColor(0, 0, 0);
-        $pdf->Cell(0, 10, 'Project Purchase Orders Management', 0, 1, 'C');
+            foreach ($ppos as $index => $ppo) {
+                // Add new page for every set of cards
+                if ($cardCount % $cardsPerPage == 0) {
+                    $pdf->AddPage('P');
 
-        // Add date
-        $pdf->SetFont('helvetica', '', 10);
-        $pdf->SetTextColor(100, 100, 100);
-        $pdf->Cell(0, 8, 'Generated: ' . date('m/d/Y, g:i:s A'), 0, 1, 'C');
-        $pdf->Ln(5);
+                    // Page Header
+                    $pdf->SetFont('helvetica', 'B', 14);
+                    $pdf->SetTextColor(103, 126, 234);
+                    $pdf->Cell(0, 8, 'PPOs Report', 0, 1, 'C');
 
-        // Table header
-        $pdf->SetFont('helvetica', 'B', 9);
-        $pdf->SetFillColor(103, 126, 234); // #677EEA
-        $pdf->SetTextColor(255, 255, 255);
-        $pdf->SetDrawColor(221, 221, 221);
+                    $pdf->SetFont('helvetica', '', 8);
+                    $pdf->SetTextColor(120, 120, 120);
+                    $pdf->Cell(0, 5, 'Generated: ' . date('d/m/Y g:i A'), 0, 1, 'C');
+                    $pdf->Ln(2);
 
-        // Column widths (total 277mm for Landscape)
-        $widths = array(10, 25, 45, 30, 30, 27, 25, 25, 30, 30);
+                    // Add footer for each page
+                    $pdf->SetY(-10);
+                    $pdf->SetFont('helvetica', 'B', 9);
+                    $pdf->SetTextColor(103, 126, 234);
+                    $pdf->Cell(0, 8, 'MDSJEDPR', 0, 0, 'C');
 
-        $pdf->Cell($widths[0], 10, '#', 1, 0, 'C', true);
-        $pdf->Cell($widths[1], 10, 'PR Number', 1, 0, 'L', true);
-        $pdf->Cell($widths[2], 10, 'Project Name', 1, 0, 'L', true);
-        $pdf->Cell($widths[3], 10, 'Category', 1, 0, 'L', true);
-        $pdf->Cell($widths[4], 10, 'Supplier', 1, 0, 'L', true);
-        $pdf->Cell($widths[5], 10, 'PO Number', 1, 0, 'L', true);
-        $pdf->Cell($widths[6], 10, 'Value', 1, 0, 'R', true);
-        $pdf->Cell($widths[7], 10, 'Date', 1, 0, 'C', true);
-        $pdf->Cell($widths[8], 10, 'Status', 1, 0, 'L', true);
-        $pdf->Cell($widths[9], 10, 'Updates', 1, 1, 'L', true);
+                    // Reset Y position for content
+                    $pdf->SetY(25);
+                }
 
-        // Table content
-        $pdf->SetFont('helvetica', '', 8);
-        $pdf->SetTextColor(0, 0, 0);
+                // Card container
+                $cardY = $pdf->GetY();
 
-        $fill = false;
-        foreach ($ppos as $index => $item) {
-            if ($fill) {
-                $pdf->SetFillColor(245, 245, 245);
-            } else {
+                // Card border and background
                 $pdf->SetFillColor(255, 255, 255);
+                $pdf->SetDrawColor(103, 126, 234);
+                $pdf->SetLineWidth(0.5);
+                $pdf->RoundedRect(10, $cardY, 190, $cardHeight, 3, '1111', 'DF');
+
+                // Card header with PO number
+                $pdf->SetFillColor(103, 126, 234);
+                $pdf->SetTextColor(255, 255, 255);
+                $pdf->RoundedRect(10, $cardY, 190, 8, 3, '1100', 'F');
+
+                $pdf->SetXY(12, $cardY + 1.5);
+                $pdf->SetFont('helvetica', 'B', 9);
+                $pdf->Cell(90, 5, 'PO: ' . ($ppo->po_number ?? 'N/A'), 0, 0, 'L');
+
+                $pdf->SetFont('helvetica', '', 7);
+                $pdf->Cell(96, 5, 'PPO #' . ($index + 1), 0, 1, 'R');
+
+                // Content area starts below the header
+                $contentStartY = $cardY + 10;
+                $currentY = $contentStartY;
+
+                // Column settings
+                $leftX = 15;
+                $rightX = 105;
+                $labelWidth = 40;
+                $valueWidth = 45;
+                $lineHeight = 6;
+
+                // Get all categories for this PO Number
+                $allCategories = Ppos::where('po_number', $ppo->po_number)
+                    ->with('pepo:id,category')
+                    ->get()
+                    ->pluck('pepo.category')
+                    ->filter()
+                    ->unique()
+                    ->implode(', ');
+
+                // === LEFT COLUMN ===
+                // PR Number
+                $pdf->SetXY($leftX, $currentY);
+                $pdf->SetFont('helvetica', 'B', 8);
+                $pdf->SetTextColor(80, 80, 80);
+                $pdf->Cell($labelWidth, $lineHeight, 'PR Number:', 0, 0, 'L');
+                $pdf->SetFont('helvetica', '', 8);
+                $pdf->SetTextColor(0, 0, 0);
+                $pdf->Cell($valueWidth, $lineHeight, $ppo->project->pr_number ?? 'N/A', 0, 1, 'L');
+                $currentY += $lineHeight;
+
+                // Project Name
+                $pdf->SetXY($leftX, $currentY);
+                $pdf->SetFont('helvetica', 'B', 8);
+                $pdf->SetTextColor(80, 80, 80);
+                $pdf->Cell($labelWidth, $lineHeight, 'Project Name:', 0, 0, 'L');
+                $pdf->SetFont('helvetica', '', 8);
+                $pdf->SetTextColor(0, 0, 0);
+                $projectName = $ppo->project->name ?? 'N/A';
+                if (strlen($projectName) > 30) {
+                    $projectName = substr($projectName, 0, 30) . '...';
+                }
+                $pdf->Cell($valueWidth, $lineHeight, $projectName, 0, 1, 'L');
+                $currentY += $lineHeight;
+
+                // Category
+                $pdf->SetXY($leftX, $currentY);
+                $pdf->SetFont('helvetica', 'B', 8);
+                $pdf->SetTextColor(80, 80, 80);
+                $pdf->Cell($labelWidth, $lineHeight, 'Category:', 0, 0, 'L');
+                $pdf->SetFont('helvetica', '', 8);
+                $pdf->SetTextColor(0, 0, 0);
+                $category = $allCategories ?: 'N/A';
+                if (strlen($category) > 30) {
+                    $category = substr($category, 0, 30) . '...';
+                }
+                $pdf->Cell($valueWidth, $lineHeight, $category, 0, 1, 'L');
+                $currentY += $lineHeight;
+
+                // Supplier Name
+                $pdf->SetXY($leftX, $currentY);
+                $pdf->SetFont('helvetica', 'B', 8);
+                $pdf->SetTextColor(80, 80, 80);
+                $pdf->Cell($labelWidth, $lineHeight, 'Supplier:', 0, 0, 'L');
+                $pdf->SetFont('helvetica', '', 8);
+                $pdf->SetTextColor(0, 0, 0);
+                $pdf->Cell($valueWidth, $lineHeight, $ppo->ds->dsname ?? 'N/A', 0, 1, 'L');
+                $currentY += $lineHeight;
+
+                // Updates (MultiCell with word wrap)
+                $pdf->SetXY($leftX, $currentY);
+                $pdf->SetFont('helvetica', 'B', 8);
+                $pdf->SetTextColor(80, 80, 80);
+                $pdf->Cell($labelWidth, $lineHeight, 'Updates:', 0, 1, 'L');
+
+                // Move to value position (same X as label start)
+                $pdf->SetXY($leftX, $pdf->GetY());
+                $pdf->SetFont('helvetica', '', 8);
+                $pdf->SetTextColor(0, 0, 0);
+                $updates = $ppo->updates ?? 'No updates';
+
+                // MultiCell for wrapping text - width to fit ~23 chars per line
+                $pdf->MultiCell(85, 5, $updates, 0, 'L', false, 1, $leftX, $pdf->GetY());
+                $currentY = $pdf->GetY() + 1;
+
+                // === RIGHT COLUMN ===
+                $rightY = $contentStartY;
+
+                // PO Number
+                $pdf->SetXY($rightX, $rightY);
+                $pdf->SetFont('helvetica', 'B', 8);
+                $pdf->SetTextColor(80, 80, 80);
+                $pdf->Cell($labelWidth, $lineHeight, 'PO Number:', 0, 0, 'L');
+                $pdf->SetFont('helvetica', '', 8);
+                $pdf->SetTextColor(0, 0, 0);
+                $pdf->Cell($valueWidth, $lineHeight, $ppo->po_number ?? 'N/A', 0, 1, 'L');
+                $rightY += $lineHeight;
+
+                // Value
+                $pdf->SetXY($rightX, $rightY);
+                $pdf->SetFont('helvetica', 'B', 8);
+                $pdf->SetTextColor(80, 80, 80);
+                $pdf->Cell($labelWidth, $lineHeight, 'Value:', 0, 0, 'L');
+                $pdf->SetFont('helvetica', 'B', 8);
+                $pdf->SetTextColor(0, 128, 0);
+                $pdf->Cell($valueWidth, $lineHeight, $ppo->value ? '$' . number_format($ppo->value, 2) : 'N/A', 0, 1, 'L');
+                $rightY += $lineHeight;
+
+                // Date
+                $pdf->SetXY($rightX, $rightY);
+                $pdf->SetFont('helvetica', 'B', 8);
+                $pdf->SetTextColor(80, 80, 80);
+                $pdf->Cell($labelWidth, $lineHeight, 'Date:', 0, 0, 'L');
+                $pdf->SetFont('helvetica', '', 8);
+                $pdf->SetTextColor(0, 0, 0);
+                $pdf->Cell($valueWidth, $lineHeight, $ppo->date ? $ppo->date->format('d/m/Y') : 'N/A', 0, 1, 'L');
+                $rightY += $lineHeight;
+
+                // Status
+                $pdf->SetXY($rightX, $rightY);
+                $pdf->SetFont('helvetica', 'B', 8);
+                $pdf->SetTextColor(80, 80, 80);
+                $pdf->Cell($labelWidth, $lineHeight, 'Status:', 0, 0, 'L');
+                $pdf->SetFont('helvetica', '', 8);
+                $pdf->SetTextColor(0, 0, 0);
+                $status = $ppo->status ?? 'N/A';
+                if (strlen($status) > 20) {
+                    $status = substr($status, 0, 20) . '...';
+                }
+                $pdf->Cell($valueWidth, $lineHeight, $status, 0, 1, 'L');
+                $rightY += $lineHeight;
+
+                // Notes
+                $pdf->SetXY($rightX, $rightY);
+                $pdf->SetFont('helvetica', 'B', 8);
+                $pdf->SetTextColor(80, 80, 80);
+                $pdf->Cell($labelWidth, $lineHeight, 'Notes:', 0, 0, 'L');
+                $pdf->SetFont('helvetica', '', 8);
+                $pdf->SetTextColor(0, 0, 0);
+                $notes = $ppo->notes ?? 'No notes';
+                if (strlen($notes) > 20) {
+                    $notes = substr($notes, 0, 20) . '...';
+                }
+                $pdf->Cell($valueWidth, $lineHeight, $notes, 0, 1, 'L');
+
+                // Move to next card position (with gap between cards)
+                $pdf->SetY($cardY + $cardHeight + $cardGap);
+                $cardCount++;
             }
 
-            // Get all categories for this PO Number
-            $allCategories = Ppos::where('po_number', $item->po_number)
-                ->with('pepo:id,category')
-                ->get()
-                ->pluck('pepo.category')
-                ->filter()
-                ->unique()
-                ->implode(', ');
+            // Output PDF
+            $filename = 'PPOs_Cards_' . date('Y-m-d_His') . '.pdf';
 
-            $pdf->Cell($widths[0], 10, ($index + 1), 1, 0, 'C', true);
-            $pdf->Cell($widths[1], 10, $item->project->pr_number ?? 'N/A', 1, 0, 'L', true);
-            $pdf->Cell($widths[2], 10, $item->project->name ?? 'N/A', 1, 0, 'L', true);
-            $pdf->Cell($widths[3], 10, $allCategories ?: 'N/A', 1, 0, 'L', true);
-            $pdf->Cell($widths[4], 10, $item->ds->dsname ?? 'N/A', 1, 0, 'L', true);
-            $pdf->Cell($widths[5], 10, $item->po_number ?? 'N/A', 1, 0, 'L', true);
-            $pdf->Cell($widths[6], 10, $item->value ? '$' . number_format($item->value, 2) : 'N/A', 1, 0, 'R', true);
-            $pdf->Cell($widths[7], 10, $item->date ? $item->date->format('Y-m-d') : 'N/A', 1, 0, 'C', true);
-            $pdf->Cell($widths[8], 10, $item->status ?? 'N/A', 1, 0, 'L', true);
-            $pdf->Cell($widths[9], 10, $item->updates ?? 'N/A', 1, 1, 'L', true);
+            return response()->streamDownload(function() use ($pdf) {
+                echo $pdf->Output('', 'S');
+            }, $filename, [
+                'Content-Type' => 'application/pdf',
+            ]);
 
-            $fill = !$fill;
+        } catch (\Exception $e) {
+            Log::error('PPOs PDF export error: ' . $e->getMessage());
+            return redirect()->back()->with('Error', 'Error generating PDF: ' . $e->getMessage());
         }
-
-        // Output PDF
-        $pdf->Output('PPOs_' . date('Y-m-d') . '.pdf', 'I');
     }
 
     /**

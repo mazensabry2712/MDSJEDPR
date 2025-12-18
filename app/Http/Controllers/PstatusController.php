@@ -210,16 +210,46 @@ class PstatusController extends Controller
                 $pdf->SetFillColor(255, 255, 255);
             }
 
-            $pdf->Cell($widths[0], 10, ($index + 1), 1, 0, 'C', true);
-            $pdf->Cell($widths[1], 10, $item->project->pr_number ?? 'N/A', 1, 0, 'L', true);
-            $pdf->Cell($widths[2], 10, $item->project->name ?? 'N/A', 1, 0, 'L', true);
-            $pdf->Cell($widths[3], 10, $item->date_time ? \Carbon\Carbon::parse($item->date_time)->format('d/m/Y H:i') : 'N/A', 1, 0, 'C', true);
-            $pdf->Cell($widths[4], 10, $item->ppm->name ?? 'N/A', 1, 0, 'L', true);
-            $pdf->Cell($widths[5], 10, $item->status ?? 'N/A', 1, 0, 'L', true);
-            $pdf->Cell($widths[6], 10, $item->actual_completion ? number_format($item->actual_completion, 2) . '%' : 'N/A', 1, 0, 'C', true);
-            $pdf->Cell($widths[7], 10, $item->expected_completion ? \Carbon\Carbon::parse($item->expected_completion)->format('d/m/Y') : 'N/A', 1, 0, 'C', true);
-            $pdf->Cell($widths[8], 10, $item->date_pending_cost_orders ?? 'N/A', 1, 0, 'L', true);
-            $pdf->Cell($widths[9], 10, $item->notes ?? 'N/A', 1, 1, 'L', true);
+            // Calculate row height based on notes content
+            $notes = $item->notes ?? 'N/A';
+
+            // Use TCPDF's getStringHeight to accurately calculate text height
+            $pdf->SetFont('helvetica', '', 7);
+            $notesHeight = $pdf->getStringHeight($widths[9] - 2, $notes); // -2 for cell padding
+            $rowHeight = max(10, $notesHeight + 2); // Add padding
+
+            // Store current Y position
+            $startY = $pdf->GetY();
+            $startX = 10; // Left margin
+
+            // Draw all cells with same calculated height
+            $pdf->Cell($widths[0], $rowHeight, ($index + 1), 1, 0, 'C', true);
+            $pdf->Cell($widths[1], $rowHeight, $item->project->pr_number ?? 'N/A', 1, 0, 'L', true);
+            $pdf->Cell($widths[2], $rowHeight, $item->project->name ?? 'N/A', 1, 0, 'L', true);
+            $pdf->Cell($widths[3], $rowHeight, $item->date_time ? \Carbon\Carbon::parse($item->date_time)->format('d/m/Y H:i') : 'N/A', 1, 0, 'C', true);
+            $pdf->Cell($widths[4], $rowHeight, $item->ppm->name ?? 'N/A', 1, 0, 'L', true);
+            $pdf->Cell($widths[5], $rowHeight, $item->status ?? 'N/A', 1, 0, 'L', true);
+            $pdf->Cell($widths[6], $rowHeight, $item->actual_completion ? number_format($item->actual_completion, 2) . '%' : 'N/A', 1, 0, 'C', true);
+            $pdf->Cell($widths[7], $rowHeight, $item->expected_completion ? \Carbon\Carbon::parse($item->expected_completion)->format('d/m/Y') : 'N/A', 1, 0, 'C', true);
+            $pdf->Cell($widths[8], $rowHeight, $item->date_pending_cost_orders ?? 'N/A', 1, 0, 'L', true);
+
+            // Calculate X position for Notes column
+            $notesX = $startX + array_sum(array_slice($widths, 0, 9));
+
+            // Draw empty bordered cell for Notes with proper background
+            $pdf->Cell($widths[9], $rowHeight, '', 1, 1, 'C', true);
+
+            // Calculate vertical centering
+            $verticalPadding = ($rowHeight - $notesHeight) / 2;
+            $notesY = $startY + max(0.5, $verticalPadding);
+
+            // Write text inside Notes cell (no border, transparent background)
+            $pdf->SetXY($notesX + 1, $notesY); // +1 for left padding
+            $pdf->SetFillColor(255, 255, 255, 0); // Transparent
+            $pdf->MultiCell($widths[9] - 2, $rowHeight, $notes, 0, 'C', false, 0);
+
+            // Move to next row
+            $pdf->SetXY($startX, $startY + $rowHeight);
 
             $fill = !$fill;
         }

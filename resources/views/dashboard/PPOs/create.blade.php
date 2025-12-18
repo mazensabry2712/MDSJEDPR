@@ -104,11 +104,11 @@
                         <div class="row">
             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label for="category" class="form-label">Categories: <span class="tx-danger">*</span></label>
-                                    <select class="form-control select2" id="category" name="category[]" multiple required>
-                                        <option value="" disabled>Select PR Number first</option>
+                                    <label for="category" class="form-label">Category: <span class="tx-danger">*</span></label>
+                                    <select class="form-control select2" id="category" name="category" required>
+                                        <option value="" disabled selected>Select PR Number first</option>
                                     </select>
-                                    <small class="text-muted">You can select multiple categories after selecting PR Number</small>
+                                    <small class="text-muted">Select category after selecting PR Number</small>
                                 </div>
                             </div>
                         </div>
@@ -222,7 +222,6 @@
             $('#category').select2({
                 placeholder: "Select PR Number first",
                 allowClear: true,
-                closeOnSelect: false,
                 width: '100%'
             });
 
@@ -304,14 +303,14 @@
 
                             // Auto-select ALL categories - Method 1: Direct val() then trigger
                             console.log('📌 Selecting category IDs:', categoryIds);
-                            
+
                             // Try multiple methods to ensure selection works
                             $('#category').val(categoryIds);
                             console.log('  Step 1: Set value with .val()');
-                            
+
                             $('#category').trigger('change');
                             console.log('  Step 2: Triggered change event');
-                            
+
                             // Also trigger Select2's specific change event
                             $('#category').trigger('change.select2');
                             console.log('  Step 3: Triggered select2 change event');
@@ -348,13 +347,13 @@
                     $('#category').select2('destroy');
                 }
 
-                $('#category').html('<option value="">No categories available</option>');
+                $('#category').html('<option value="" disabled selected>No categories available</option>');
                 $('#category').prop('disabled', true);
 
                 // Re-initialize Select2
                 $('#category').select2({
                     placeholder: 'No categories available',
-                    allowClear: false
+                    allowClear: true
                 });
             }
         });

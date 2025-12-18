@@ -50,7 +50,7 @@ class SupplierProjectsExport implements FromCollection, WithHeadings, WithStyles
             'Project Name',
             'PO Number',
             'PO Value',
-            'All DS'
+            'All D/S'
         ];
     }
 
@@ -106,7 +106,7 @@ class SupplierProjectsExport implements FromCollection, WithHeadings, WithStyles
             'C' => 35,  // Project Name
             'D' => 20,  // PO Number
             'E' => 15,  // PO Value
-            'F' => 30,  // All DS
+            'F' => 30,  // All D/S
         ];
     }
 

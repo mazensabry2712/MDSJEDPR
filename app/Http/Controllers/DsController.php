@@ -44,7 +44,7 @@ class DsController extends Controller
         ]);
 
         Cache::forget('ds_list');
-        session()->flash('Add', 'Delivery Specialist registration successful');
+        session()->flash('Add', 'Distributor/Supplier registration successful');
         return redirect('/ds');
     }
 
@@ -86,7 +86,7 @@ class DsController extends Controller
         ]);
 
         Cache::forget('ds_list');
-        session()->flash('edit', 'Delivery Specialist updated successfully!');
+        session()->flash('edit', 'Distributor/Supplier updated successfully!');
         return redirect('/ds');
     }
 
@@ -100,7 +100,7 @@ class DsController extends Controller
         $ds->delete();
 
         Cache::forget('ds_list');
-        session()->flash('delete', 'Delivery Specialist deleted successfully');
+        session()->flash('delete', 'Distributor/Supplier deleted successfully');
         return redirect('/ds');
     }
 
@@ -116,7 +116,7 @@ class DsController extends Controller
         // Set document information
         $pdf->SetCreator('MDSJEDPR');
         $pdf->SetAuthor('MDSJEDPR');
-        $pdf->SetTitle('Delivery Specialists');
+        $pdf->SetTitle('Distributors/Suppliers');
         $pdf->SetSubject('DS List');
 
         // Remove default header/footer
@@ -138,7 +138,7 @@ class DsController extends Controller
         // Add title
         $pdf->SetFont('helvetica', 'B', 14);
         $pdf->SetTextColor(0, 0, 0);
-        $pdf->Cell(0, 10, 'Delivery Specialists Management', 0, 1, 'C');
+        $pdf->Cell(0, 10, 'Distributors/Suppliers Management', 0, 1, 'C');
 
         // Add date
         $pdf->SetFont('helvetica', '', 10);

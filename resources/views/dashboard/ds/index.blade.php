@@ -198,7 +198,7 @@
     <div class="breadcrumb-header justify-content-between">
         <div class="my-auto">
             <div class="d-flex">
-                <h4 class="content-title mb-0 my-auto">Distributors / Suppliers</h4><span class="text-muted mt-1 tx-13 mr-2 mb-0">/ All DS</span>
+                <h4 class="content-title mb-0 my-auto">Distributors / Suppliers</h4><span class="text-muted mt-1 tx-13 mr-2 mb-0">/ All D/S</span>
             </div>
         </div>
         <div class="d-flex my-xl-auto right-content">
@@ -266,7 +266,7 @@
                                 @can('Add')
                                     <a class="modal-effect btn btn-primary" data-effect="effect-scale" data-toggle="modal"
                                         href="#modaldemo8">
-                                        <i class="fas fa-plus"></i> Add Delivery Specialist
+                                        <i class="fas fa-plus"></i> Add Distributor/Supplier
                                     </a>
                                 @endcan
                             </div>
@@ -351,7 +351,7 @@
                         </div>
                         <div class="form-group">
                             <label for="ds_contact">D/S Contact Details </label>
-                            <textarea class="form-control" id="ds_contact" name="ds_contact" rows="4" placeholder="Enter delivery specialist contact details..."></textarea>
+                            <textarea class="form-control" id="ds_contact" name="ds_contact" rows="4" placeholder="Enter distributor/supplier contact details..."></textarea>
                         </div>
                         <div class="modal-footer">
                             <button type="submit" class="btn btn-outline-primary">Add</button>
@@ -447,7 +447,7 @@
                         </div>
                         <div class="form-group">
                             <label for="ds_contact" class="col-form-label">D/S Contact Details</label>
-                            <textarea class="form-control" name="ds_contact" id="ds_contact" rows="4" placeholder="Enter delivery specialist contact details..."></textarea>
+                            <textarea class="form-control" name="ds_contact" id="ds_contact" rows="4" placeholder="Enter distributor/supplier contact details..."></textarea>
                         </div>
 
 
@@ -597,7 +597,7 @@
                 });
 
                 // Convert to Excel worksheet
-                let worksheet = '<ss:Worksheet ss:Name="Delivery Specialists"><ss:Table>';
+                let worksheet = '<ss:Worksheet ss:Name="Distributors/Suppliers"><ss:Table>';
 
                 excelData.forEach((row, rowIndex) => {
                     worksheet += '<ss:Row>';
@@ -678,7 +678,7 @@
                     <!DOCTYPE html>
                     <html>
                     <head>
-                        <title>Delivery Specialist Details - ${dsName}</title>
+                        <title>Distributor/Supplier Details - ${dsName}</title>
                         <style>
                             body { font-family: Arial, sans-serif; margin: 40px; line-height: 1.6; }
                             .header { text-align: center; margin-bottom: 40px; border-bottom: 3px solid #667eea; padding-bottom: 20px; }
@@ -697,7 +697,7 @@
                     </head>
                     <body>
                         <div class="header">
-                            <h1>Delivery Specialist Details</h1>
+                            <h1>Distributor/Supplier Details</h1>
                             <p>Generated on: ${new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
                         </div>
                         <div class="ds-details">
@@ -711,7 +711,7 @@
                             </div>
                         </div>
                         <div class="footer">
-                            <p>Corporate Sites Management System - Delivery Specialist Report</p>
+                            <p>Corporate Sites Management System - Distributor/Supplier Report</p>
                             <p>This is an automatically generated document</p>
                         </div>
                     </body>
@@ -814,22 +814,22 @@
                     {
                         extend: 'pdfHtml5',
                         className: 'buttons-pdf d-none',
-                        title: 'Delivery Specialists List'
+                        title: 'Distributors/Suppliers List'
                     },
                     {
                         extend: 'excelHtml5',
                         className: 'buttons-excel d-none',
-                        title: 'Delivery Specialists List'
+                        title: 'Distributors/Suppliers List'
                     },
                     {
                         extend: 'csvHtml5',
                         className: 'buttons-csv d-none',
-                        title: 'Delivery Specialists List'
+                        title: 'Distributors/Suppliers List'
                     },
                     {
                         extend: 'print',
                         className: 'buttons-print d-none',
-                        title: 'Delivery Specialists List'
+                        title: 'Distributors/Suppliers List'
                     }
                 ],
                 responsive: true,

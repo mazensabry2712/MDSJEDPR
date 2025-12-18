@@ -473,19 +473,6 @@
                                     <i class="fas fa-users mr-2"></i>Team & Relationships
                                 </h3>
 
-                                <!-- Primary Customer -->
-                                <div class="info-item">
-                                    <div class="info-icon icon-primary">
-                                        <i class="fas fa-building"></i>
-                                    </div>
-                                    <div class="info-content">
-                                        <div class="info-label">Primary Customer</div>
-                                        <div class="info-value {{ !$project->cust ? 'empty-value' : '' }}">
-                                            {{ $project->cust->name ?? 'Not assigned' }}
-                                        </div>
-                                    </div>
-                                </div>
-
                                 <!-- All Customers -->
                                 @if($project->customers && $project->customers->count() > 0)
                                 <div class="info-item">
@@ -496,11 +483,8 @@
                                         <div class="info-label">All Customers</div>
                                         <div class="info-value">
                                             @foreach($project->customers as $customer)
-                                                <span class="badge badge-{{ $customer->pivot->is_primary ? 'success' : 'info' }} mr-1">
+                                                <span class="badge badge-info mr-1">
                                                     {{ $customer->name }}
-                                                    @if($customer->pivot->is_primary)
-                                                        <i class="fas fa-star ml-1" title="Primary"></i>
-                                                    @endif
                                                     @if($customer->pivot->project_role)
                                                         <small class="d-block">{{ $customer->pivot->project_role }}</small>
                                                     @endif
@@ -510,19 +494,6 @@
                                     </div>
                                 </div>
                                 @endif
-
-                                <!-- Primary Vendor -->
-                                <div class="info-item">
-                                    <div class="info-icon icon-warning">
-                                        <i class="fas fa-truck"></i>
-                                    </div>
-                                    <div class="info-content">
-                                        <div class="info-label">Primary Vendor</div>
-                                        <div class="info-value {{ !$project->vendor ? 'empty-value' : '' }}">
-                                            {{ $project->vendor->vendors ?? 'Not assigned' }}
-                                        </div>
-                                    </div>
-                                </div>
 
                                 <!-- All Vendors -->
                                 @if($project->vendors && $project->vendors->count() > 0)
@@ -534,11 +505,8 @@
                                         <div class="info-label">All Vendors</div>
                                         <div class="info-value">
                                             @foreach($project->vendors as $vendor)
-                                                <span class="badge badge-{{ $vendor->pivot->is_primary ? 'success' : 'info' }} mr-1">
+                                                <span class="badge badge-info mr-1">
                                                     {{ $vendor->vendors }}
-                                                    @if($vendor->pivot->is_primary)
-                                                        <i class="fas fa-star ml-1" title="Primary"></i>
-                                                    @endif
                                                     @if($vendor->pivot->service_type)
                                                         <small class="d-block">{{ $vendor->pivot->service_type }}</small>
                                                     @endif
@@ -573,13 +541,13 @@
                                     </div>
                                 </div>
 
-                                <!-- Lead Delivery Specialist -->
+                                <!-- Lead Distributor/Supplier -->
                                 <div class="info-item">
                                     <div class="info-icon icon-danger">
                                         <i class="fas fa-chart-line"></i>
                                     </div>
                                     <div class="info-content">
-                                        <div class="info-label">Lead Delivery Specialist</div>
+                                        <div class="info-label">Lead Distributor/Supplier</div>
                                         <div class="info-value {{ !$project->ds ? 'empty-value' : '' }}">
                                             {{ $project->ds->name ?? 'Not assigned' }}
                                         </div>
@@ -596,11 +564,8 @@
                                         <div class="info-label">All Disti/Supplier</div>
                                         <div class="info-value">
                                             @foreach($project->deliverySpecialists as $ds)
-                                                <span class="badge badge-{{ $ds->pivot->is_primary ? 'success' : 'info' }} mr-1">
+                                                <span class="badge badge-info mr-1">
                                                     {{ $ds->name }}
-                                                    @if($ds->pivot->is_primary)
-                                                        <i class="fas fa-star ml-1" title="Lead"></i>
-                                                    @endif
                                                     @if($ds->pivot->specialization)
                                                         <small class="d-block">{{ $ds->pivot->specialization }}</small>
                                                     @endif

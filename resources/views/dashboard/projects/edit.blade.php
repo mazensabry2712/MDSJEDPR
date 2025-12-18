@@ -252,7 +252,7 @@
                                             </option>
                                         @endforeach
                                     </select>
-                                    <small class="form-text text-muted">Select one or more vendors. First selected will be primary.</small>
+                                    <small class="form-text text-muted">Select one or more vendors.</small>
                                     @error('vendors')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
@@ -585,7 +585,7 @@
             $('#vendors').on('change', function() {
                 var selected = $(this).val();
                 if (selected && selected.length > 0) {
-                    $('#vendors_id').val(selected[0]); // First selected becomes primary
+                    $('#vendors_id').val(selected[0]);
                 } else {
                     $('#vendors_id').val('');
                 }
@@ -594,7 +594,7 @@
             $('#delivery_specialists').on('change', function() {
                 var selected = $(this).val();
                 if (selected && selected.length > 0) {
-                    $('#ds_id').val(selected[0]); // First selected becomes lead
+                    $('#ds_id').val(selected[0]);
                 } else {
                     $('#ds_id').val('');
                 }

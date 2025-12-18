@@ -252,16 +252,8 @@
                         <span class="field-value">{{ $project->technologies ?? 'N/A' }}</span>
                     </div>
                     <div class="field">
-                        <span class="field-label">Primary Vendor:</span>
-                        <span class="field-value">{{ optional($project->vendor)->vendors ?? 'N/A' }}</span>
-                    </div>
-                    <div class="field">
                         <span class="field-label">All Vendors:</span>
                         <span class="field-value">{{ $allVendors }}</span>
-                    </div>
-                    <div class="field">
-                        <span class="field-label">Primary Customer:</span>
-                        <span class="field-value">{{ optional($project->cust)->name ?? 'N/A' }}</span>
                     </div>
                     <div class="field">
                         <span class="field-label">All Customers:</span>
@@ -284,11 +276,7 @@
                         <span class="field-value">{{ optional($project->ppms)->name ?? 'N/A' }}</span>
                     </div>
                     <div class="field">
-                        <span class="field-label">Primary DS:</span>
-                        <span class="field-value">{{ optional($project->ds)->dsname ?? 'N/A' }}</span>
-                    </div>
-                    <div class="field">
-                        <span class="field-label">All DS:</span>
+                        <span class="field-label">All D/S:</span>
                         <span class="field-value">{{ $allDS }}</span>
                     </div>
                 </div>

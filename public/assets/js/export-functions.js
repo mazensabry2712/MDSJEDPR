@@ -195,7 +195,7 @@ function generateExcel(button, originalHTML) {
             { wch: 25 }, // Project Name
             { wch: 15 }, // Technologies
             { wch: 20 }, // All Vendors
-            { wch: 20 }, // All DS
+            { wch: 20 }, // All D/S
             { wch: 20 }, // Customer
             { wch: 15 }, // Customer PO
             { wch: 12 }, // Value
