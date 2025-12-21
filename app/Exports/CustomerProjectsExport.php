@@ -28,13 +28,13 @@ class CustomerProjectsExport implements FromCollection, WithHeadings, WithStyles
     {
         $collection = new Collection();
 
-        foreach ($this->data as $index => $project) {
+        foreach ($this->data as $project) {
             $collection->push([
-                $index + 1,
+                $project['index'] ?? '',
                 $project['pr_number'] ?? 'N/A',
                 $project['name'] ?? 'N/A',
                 $project['value'] ?? 'N/A',
-                $project['customer_po'] ?? 'N/A',
+                $project['po_number'] ?? 'N/A',
                 $project['deadline'] ?? 'N/A'
             ]);
         }

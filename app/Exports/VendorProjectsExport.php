@@ -33,10 +33,7 @@ class VendorProjectsExport implements FromCollection, WithHeadings, WithStyles, 
                 $index + 1,
                 $project['pr_number'] ?? 'N/A',
                 $project['name'] ?? 'N/A',
-                $project['customer'] ?? 'N/A',
-                $project['value'] ?? 'N/A',
-                $project['po_number'] ?? 'N/A',
-                $project['deadline'] ?? 'N/A'
+                $project['customer'] ?? 'N/A'
             ]);
         }
 
@@ -49,10 +46,7 @@ class VendorProjectsExport implements FromCollection, WithHeadings, WithStyles, 
             '#',
             'PR Number',
             'Project Name',
-            'Customer',
-            'Value',
-            'PO Number',
-            'Deadline'
+            'Customer'
         ];
     }
 
@@ -104,12 +98,9 @@ class VendorProjectsExport implements FromCollection, WithHeadings, WithStyles, 
     {
         return [
             'A' => 8,   // #
-            'B' => 15,  // PR Number
-            'C' => 35,  // Project Name
-            'D' => 25,  // Customer
-            'E' => 15,  // Value
-            'F' => 20,  // PO Number
-            'G' => 15,  // Deadline
+            'B' => 18,  // PR Number
+            'C' => 40,  // Project Name
+            'D' => 30,  // Customer
         ];
     }
 

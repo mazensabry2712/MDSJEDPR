@@ -693,7 +693,12 @@
 
         {{-- Customer Info Card --}}
         <div id="customerInfoCard" class="info-card customer" style="display: none;">
-            <h3 id="customerName"><i class="fas fa-building mr-2"></i></h3>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                <h3 id="customerName" style="margin: 0;"><i class="fas fa-building mr-2"></i></h3>
+                <button id="btnPrintCustomer" class="btn btn-sm btn-primary" style="white-space: nowrap; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                    <i class="fas fa-print mr-1"></i> Print Report
+                </button>
+            </div>
             <div class="row">
                 <div class="col-md-6">
                     <div class="info-item">
@@ -734,8 +739,11 @@
 
         {{-- Projects Table --}}
         <div id="projectsTableCard" class="projects-table-card" style="display: none;">
-            <div class="card-header">
-                <h4><i class="fas fa-list mr-2"></i>Customer Projects</h4>
+            <div class="card-header" style="background: linear-gradient(135deg, #007bff 0%, #0056b3 100%); display: flex; justify-content: space-between; align-items: center;">
+                <h4 style="margin: 0;"><i class="fas fa-list mr-2"></i>Customer Projects</h4>
+                <button id="btnExportCustomer" class="btn btn-sm btn-light" style="box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                    <i class="fas fa-file-excel mr-1"></i> Export to Excel
+                </button>
             </div>
             <div class="table-responsive">
                 <table class="table table-modern table-hover mb-0">
@@ -773,20 +781,11 @@
 
         {{-- Vendor Info Card --}}
         <div id="vendorInfoCard" class="info-card vendor" style="display: none;">
-            <h3 id="vendorName"><i class="fas fa-briefcase mr-2"></i></h3>
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="info-item">
-                        <i class="fas fa-tag"></i>
-                        <span>Abbreviation: <strong id="vendorAbb"></strong></span>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="info-item">
-                        <i class="fas fa-list"></i>
-                        <span>Type: <strong id="vendorType"></strong></span>
-                    </div>
-                </div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                <h3 id="vendorName" style="margin: 0;"><i class="fas fa-briefcase mr-2"></i></h3>
+                <button id="btnPrintVendor" class="btn btn-sm btn-success" style="white-space: nowrap; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                    <i class="fas fa-print mr-1"></i> Print Report
+                </button>
             </div>
         </div>
 
@@ -814,20 +813,20 @@
 
         {{-- Vendor Projects Table --}}
         <div id="projectsTableCardVendor" class="projects-table-card" style="display: none;">
-            <div class="card-header" style="background: linear-gradient(135deg, #28a745 0%, #218838 100%);">
-                <h4><i class="fas fa-list mr-2"></i>Vendor Projects</h4>
+            <div class="card-header" style="background: linear-gradient(135deg, #28a745 0%, #218838 100%); display: flex; justify-content: space-between; align-items: center;">
+                <h4 style="margin: 0;"><i class="fas fa-list mr-2"></i>Vendor Projects</h4>
+                <button id="btnExportVendor" class="btn btn-sm btn-light" style="box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                    <i class="fas fa-file-excel mr-1"></i> Export to Excel
+                </button>
             </div>
             <div class="table-responsive">
-                <table class="table table-modern table-hover mb-0">
+                <table class="table table-modern table-hover mb-0" id="vendorProjectsTable">
                     <thead>
                         <tr>
                             <th>#</th>
                             <th><i class="fas fa-hashtag mr-1"></i>PR Number</th>
                             <th><i class="fas fa-briefcase mr-1"></i>Project Name</th>
                             <th><i class="fas fa-building mr-1"></i>Customer</th>
-                            <th><i class="fas fa-dollar-sign mr-1"></i>Value</th>
-                            <th><i class="fas fa-file-invoice mr-1"></i>PO Number</th>
-                            <th><i class="fas fa-calendar mr-1"></i>Deadline</th>
                         </tr>
                     </thead>
                     <tbody id="projectsTableBodyVendor">
@@ -1367,8 +1366,6 @@ $(document).ready(function() {
 
                     // Display vendor info
                     $('#vendorName').html('<i class="fas fa-briefcase mr-2"></i>' + escapeHtml(response.vendor.name));
-                    $('#vendorAbb').text(response.vendor.abb || 'N/A');
-                    $('#vendorType').text(response.vendor.type || 'N/A');
                     $('#vendorInfoCard').fadeIn();
 
                     // Display statistics
@@ -1390,9 +1387,6 @@ $(document).ready(function() {
                                     <td><strong>${escapeHtml(project.pr_number)}</strong></td>
                                     <td>${escapeHtml(project.name)}</td>
                                     <td><span class="badge badge-info">${escapeHtml(project.customer_name || 'N/A')}</span></td>
-                                    <td><strong class="text-success">$${escapeHtml(project.value)}</strong></td>
-                                    <td>${escapeHtml(project.customer_po || 'N/A')}</td>
-                                    <td>${escapeHtml(project.deadline || 'N/A')}</td>
                                 </tr>
                             `;
                         });
@@ -1427,6 +1421,335 @@ $(document).ready(function() {
                 console.error('AJAX Error:', xhr);
             }
         });
+    }
+
+    // Function to export vendor projects to Excel
+    function exportVendorProjectsToExcel() {
+        console.log('exportVendorProjectsToExcel called');
+
+        const vendorSelectValue = $('#vendorSelect').val();
+        console.log('Selected vendor:', vendorSelectValue);
+
+        if (!vendorSelectValue) {
+            showToast('Please select a vendor first', 'warning');
+            return;
+        }
+
+        const tableRows = $('#projectsTableBodyVendor tr');
+        if (tableRows.length === 0) {
+            showToast('No vendor projects to export', 'warning');
+            return;
+        }
+
+        // Disable button during export
+        $('#btnExportVendor').prop('disabled', true).html('<i class="fas fa-spinner fa-spin mr-1"></i> Exporting...');
+
+        const form = $('<form>', {
+            method: 'POST',
+            action: '{{ route('reports.export.vendor.projects') }}',
+            target: '_blank'
+        });
+
+        form.append($('<input>', { type: 'hidden', name: '_token', value: '{{ csrf_token() }}' }));
+        form.append($('<input>', { type: 'hidden', name: 'vendor_name', value: vendorSelectValue }));
+
+        console.log('Submitting form with vendor:', vendorSelectValue);
+        form.appendTo('body').submit().remove();
+
+        showToast('Exporting vendor projects to Excel...', 'success');
+
+        // Re-enable button after a short delay
+        setTimeout(() => {
+            $('#btnExportVendor').prop('disabled', false).html('<i class="fas fa-file-excel mr-1"></i> Export to Excel');
+        }, 2000);
+    }
+
+    // Function to print vendor projects
+    function printVendorProjects() {
+        const vendorName = $('#vendorName').text().replace(/.*?<\/i>/, '').trim() || 'Vendor';
+        const totalProjects = $('#totalProjectsVendor').text().trim();
+        const totalValue = $('#totalValueVendor').text().trim();
+        const tableRows = $('#projectsTableBodyVendor tr');
+
+        if (tableRows.length === 0) {
+            showToast('No projects to print', 'warning');
+            return;
+        }
+
+        // Disable button during print
+        $('#btnPrintVendor').prop('disabled', true).html('<i class="fas fa-spinner fa-spin mr-1"></i> Preparing...');
+
+        let printContent = `
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <meta charset="UTF-8">
+                <title>Vendor Projects - ${vendorName}</title>
+                <style>
+                    body { font-family: Arial, sans-serif; padding: 20px; }
+                    .header { text-align: center; margin-bottom: 30px; border-bottom: 3px solid #28a745; padding-bottom: 20px; }
+                    .header h1 { color: #28a745; margin: 0; font-size: 32px; }
+                    .header h2 { color: #333; margin: 10px 0; }
+                    .info-section { margin: 20px 0; padding: 15px; background: #f8f9fa; border-radius: 5px; }
+                    .stats { display: flex; justify-content: center; gap: 40px; margin: 20px 0; }
+                    .stat-box { text-align: center; padding: 15px; background: #e9ecef; border-radius: 5px; min-width: 150px; }
+                    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+                    th { background: #28a745; color: white; padding: 12px; text-align: left; border: 1px solid #218838; }
+                    td { padding: 10px; border: 1px solid #ddd; }
+                    tr:nth-child(even) { background: #f8f9fa; }
+                    tr:hover { background: #e9ecef; }
+                    @media print {
+                        body { padding: 10px; }
+                        .no-print { display: none; }
+                        tr:hover { background: inherit; }
+                    }
+                </style>
+            </head>
+            <body>
+                <div class="header">
+                    <h1>MDSJEDPR</h1>
+                    <h2>Vendor Projects Report</h2>
+                    <p>Generated: ${new Date().toLocaleString('en-US', {
+                        year: 'numeric',
+                        month: '2-digit',
+                        day: '2-digit',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    })}</p>
+                </div>
+                <div class="info-section">
+                    <h3 style="margin: 0 0 10px 0; color: #28a745;">${vendorName}</h3>
+                </div>
+                <div class="stats">
+                    <div class="stat-box">
+                        <h4 style="margin: 0 0 10px 0; color: #666;">Total Projects</h4>
+                        <p style="font-size: 24px; font-weight: bold; margin: 5px 0; color: #28a745;">${totalProjects}</p>
+                    </div>
+                    <div class="stat-box">
+                        <h4 style="margin: 0 0 10px 0; color: #666;">Total Value</h4>
+                        <p style="font-size: 24px; font-weight: bold; color: #28a745; margin: 5px 0;">${totalValue}</p>
+                    </div>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width: 50px;">#</th>
+                            <th>PR Number</th>
+                            <th>Project Name</th>
+                            <th>Customer</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+        `;
+
+        tableRows.each(function() {
+            const row = $(this);
+            const cells = row.find('td');
+            printContent += `
+                <tr>
+                    <td style="text-align: center;">${cells.eq(0).text()}</td>
+                    <td><strong>${cells.eq(1).text()}</strong></td>
+                    <td>${cells.eq(2).text()}</td>
+                    <td>${cells.eq(3).text()}</td>
+                </tr>
+            `;
+        });
+
+        printContent += `
+                    </tbody>
+                </table>
+            </body>
+            </html>
+        `;
+
+        const printWindow = window.open('', '_blank');
+        printWindow.document.write(printContent);
+        printWindow.document.close();
+        printWindow.focus();
+
+        setTimeout(() => {
+            printWindow.print();
+            $('#btnPrintVendor').prop('disabled', false).html('<i class="fas fa-print mr-1"></i> Print Report');
+        }, 500);
+    }
+
+    // Bind button events
+    $(document).on('click', '#btnExportVendor', function() {
+        exportVendorProjectsToExcel();
+    });
+
+    $(document).on('click', '#btnPrintVendor', function() {
+        printVendorProjects();
+    });
+
+    $(document).on('click', '#btnExportCustomer', function() {
+        exportCustomerProjectsToExcel();
+    });
+
+    $(document).on('click', '#btnPrintCustomer', function() {
+        printCustomerProjects();
+    });
+
+    // Function to export customer projects to Excel
+    function exportCustomerProjectsToExcel() {
+        console.log('exportCustomerProjectsToExcel called');
+
+        const customerSelectValue = $('#customerSelect').val();
+        console.log('Selected customer:', customerSelectValue);
+
+        if (!customerSelectValue) {
+            showToast('Please select a customer first', 'warning');
+            return;
+        }
+
+        const tableRows = $('#projectsTableBody tr');
+        if (tableRows.length === 0) {
+            showToast('No customer projects to export', 'warning');
+            return;
+        }
+
+        // Disable button during export
+        $('#btnExportCustomer').prop('disabled', true).html('<i class="fas fa-spinner fa-spin mr-1"></i> Exporting...');
+
+        const form = $('<form>', {
+            method: 'POST',
+            action: '{{ route('reports.export.customer.projects') }}',
+            target: '_blank'
+        });
+
+        form.append($('<input>', { type: 'hidden', name: '_token', value: '{{ csrf_token() }}' }));
+        form.append($('<input>', { type: 'hidden', name: 'customer_name', value: customerSelectValue }));
+
+        console.log('Submitting form with customer:', customerSelectValue);
+        form.appendTo('body').submit().remove();
+
+        showToast('Exporting customer projects to Excel...', 'success');
+
+        // Re-enable button after a short delay
+        setTimeout(() => {
+            $('#btnExportCustomer').prop('disabled', false).html('<i class="fas fa-file-excel mr-1"></i> Export to Excel');
+        }, 2000);
+    }
+
+    // Function to print customer projects
+    function printCustomerProjects() {
+        const customerName = $('#customerName').text().replace(/.*?<\/i>/, '').trim() || 'Customer';
+        const customerAbb = $('#customerAbb').text().trim();
+        const customerType = $('#customerType').text().trim();
+        const totalProjects = $('#totalProjects').text().trim();
+        const totalValue = $('#totalValue').text().trim();
+        const tableRows = $('#projectsTableBody tr');
+
+        if (tableRows.length === 0) {
+            showToast('No projects to print', 'warning');
+            return;
+        }
+
+        // Disable button during print
+        $('#btnPrintCustomer').prop('disabled', true).html('<i class="fas fa-spinner fa-spin mr-1"></i> Preparing...');
+
+        let printContent = `
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <meta charset="UTF-8">
+                <title>Customer Projects - ${customerName}</title>
+                <style>
+                    body { font-family: Arial, sans-serif; padding: 20px; }
+                    .header { text-align: center; margin-bottom: 30px; border-bottom: 3px solid #007bff; padding-bottom: 20px; }
+                    .header h1 { color: #007bff; margin: 0; font-size: 32px; }
+                    .header h2 { color: #333; margin: 10px 0; }
+                    .info-section { margin: 20px 0; padding: 15px; background: #f8f9fa; border-radius: 5px; }
+                    .info-row { display: flex; gap: 30px; margin: 10px 0; }
+                    .info-item { flex: 1; }
+                    .stats { display: flex; justify-content: center; gap: 40px; margin: 20px 0; }
+                    .stat-box { text-align: center; padding: 15px; background: #e9ecef; border-radius: 5px; min-width: 150px; }
+                    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+                    th { background: #007bff; color: white; padding: 12px; text-align: left; border: 1px solid #0056b3; }
+                    td { padding: 10px; border: 1px solid #ddd; }
+                    tr:nth-child(even) { background: #f8f9fa; }
+                    tr:hover { background: #e9ecef; }
+                    @media print {
+                        body { padding: 10px; }
+                        .no-print { display: none; }
+                        tr:hover { background: inherit; }
+                    }
+                </style>
+            </head>
+            <body>
+                <div class="header">
+                    <h1>MDSJEDPR</h1>
+                    <h2>Customer Projects Report</h2>
+                    <p>Generated: ${new Date().toLocaleString('en-US', {
+                        year: 'numeric',
+                        month: '2-digit',
+                        day: '2-digit',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    })}</p>
+                </div>
+                <div class="info-section">
+                    <h3 style="margin: 0 0 10px 0; color: #007bff;">${customerName}</h3>
+                    <div class="info-row">
+                        <div class="info-item"><strong>Abbreviation:</strong> ${customerAbb}</div>
+                        <div class="info-item"><strong>Type:</strong> ${customerType}</div>
+                    </div>
+                </div>
+                <div class="stats">
+                    <div class="stat-box">
+                        <h4 style="margin: 0 0 10px 0; color: #666;">Total Projects</h4>
+                        <p style="font-size: 24px; font-weight: bold; margin: 5px 0; color: #007bff;">${totalProjects}</p>
+                    </div>
+                    <div class="stat-box">
+                        <h4 style="margin: 0 0 10px 0; color: #666;">Total Value</h4>
+                        <p style="font-size: 24px; font-weight: bold; color: #007bff; margin: 5px 0;">${totalValue}</p>
+                    </div>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>PR Number</th>
+                            <th>Project Name</th>
+                            <th>Value</th>
+                            <th>Customer PO</th>
+                            <th>Deadline</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+        `;
+
+        tableRows.each(function() {
+            const row = $(this);
+            const cells = row.find('td');
+            printContent += `
+                <tr>
+                    <td style="text-align: center;">${cells.eq(0).text()}</td>
+                    <td><strong>${cells.eq(1).text()}</strong></td>
+                    <td>${cells.eq(2).text()}</td>
+                    <td>${cells.eq(3).text()}</td>
+                    <td>${cells.eq(4).text()}</td>
+                    <td>${cells.eq(5).text()}</td>
+                </tr>
+            `;
+        });
+
+        printContent += `
+                    </tbody>
+                </table>
+            </body>
+            </html>
+        `;
+
+        const printWindow = window.open('', '_blank');
+        printWindow.document.write(printContent);
+        printWindow.document.close();
+        printWindow.focus();
+
+        setTimeout(() => {
+            printWindow.print();
+            $('#btnPrintCustomer').prop('disabled', false).html('<i class="fas fa-print mr-1"></i> Print Report');
+        }, 500);
     }
 
     // Function to load supplier projects

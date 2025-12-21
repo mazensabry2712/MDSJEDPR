@@ -68,27 +68,47 @@ class ReportController extends Controller
     public function exportCustomerProjects(Request $request)
     {
         try {
-            // Get projects data - it comes as JSON string
-            $projectsJson = $request->input('projects', '[]');
-            $data = is_array($projectsJson) ? $projectsJson : json_decode($projectsJson, true);
+            $customerName = $request->input('customer_name');
 
-            $customerName = $request->input('customer_name', 'Customer');
+            if (empty($customerName)) {
+                return response()->json(['success' => false, 'message' => 'Customer name is required'], 400);
+            }
 
-            if (empty($data) || !is_array($data)) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'No data to export'
-                ], 400);
+            // Find customer by name
+            $customer = Cust::where('name', $customerName)->first();
+
+            if (!$customer) {
+                return response()->json(['success' => false, 'message' => 'Customer not found'], 404);
+            }
+
+            // Get all projects for this customer with full details
+            $projects = Project::where('cust_id', $customer->id)
+                ->select('id', 'pr_number', 'name', 'value', 'customer_po', 'customer_po_deadline')
+                ->get()
+                ->map(function ($project, $index) {
+                    return [
+                        'index' => $index + 1,
+                        'pr_number' => $project->pr_number,
+                        'name' => $project->name,
+                        'value' => $project->value,
+                        'po_number' => $project->customer_po,
+                        'deadline' => $project->customer_po_deadline ? \Carbon\Carbon::parse($project->customer_po_deadline)->format('Y-m-d') : 'N/A'
+                    ];
+                })
+                ->toArray();
+
+            if (empty($projects)) {
+                return response()->json(['success' => false, 'message' => 'No projects found for this customer'], 404);
             }
 
             $fileName = 'Customer_Projects_' . str_replace(' ', '_', $customerName) . '_' . date('Y-m-d_H-i-s') . '.xlsx';
-
-            return Excel::download(new CustomerProjectsExport($data, $customerName), $fileName);
+            return Excel::download(new CustomerProjectsExport($projects, $customerName), $fileName);
         } catch (\Exception $e) {
             Log::error('Customer Projects Excel Export Error: ' . $e->getMessage());
+            Log::error('Stack trace: ' . $e->getTraceAsString());
             return response()->json([
                 'success' => false,
-                'message' => 'Failed to export projects to Excel'
+                'message' => 'Failed to export: ' . $e->getMessage()
             ], 500);
         }
     }
@@ -223,8 +243,6 @@ class ReportController extends Controller
                 'vendor' => [
                     'id' => $vendor->id,
                     'name' => $vendor->vendors,
-                    'abb' => 'N/A',
-                    'type' => 'Vendor',
                 ],
                 'projects' => $formattedProjects,
                 'total_projects' => $projects->count(),
@@ -629,19 +647,49 @@ class ReportController extends Controller
     public function exportVendorProjects(Request $request)
     {
         try {
-            $projectsJson = $request->input('projects', '[]');
-            $data = is_array($projectsJson) ? $projectsJson : json_decode($projectsJson, true);
-            $vendorName = $request->input('vendor_name', 'Vendor');
+            $vendorName = $request->input('vendor_name');
 
-            if (empty($data) || !is_array($data)) {
-                return response()->json(['success' => false, 'message' => 'No data to export'], 400);
+            if (empty($vendorName)) {
+                return response()->json(['success' => false, 'message' => 'Vendor name is required'], 400);
+            }
+
+            // Find vendor by name (column is 'vendors' not 'name')
+            $vendor = Vendors::where('vendors', $vendorName)->first();
+
+            if (!$vendor) {
+                return response()->json(['success' => false, 'message' => 'Vendor not found'], 404);
+            }
+
+            // Get all projects for this vendor with full details
+            $projects = Project::where('vendors_id', $vendor->id)
+                ->with(['cust:id,name'])
+                ->get()
+                ->map(function ($project, $index) {
+                    return [
+                        'index' => $index + 1,
+                        'pr_number' => $project->pr_number,
+                        'name' => $project->name,
+                        'customer' => $project->cust->name ?? 'N/A',
+                        'value' => $project->value,
+                        'po_number' => $project->customer_po,
+                        'deadline' => $project->customer_po_deadline ? \Carbon\Carbon::parse($project->customer_po_deadline)->format('Y-m-d') : 'N/A'
+                    ];
+                })
+                ->toArray();
+
+            if (empty($projects)) {
+                return response()->json(['success' => false, 'message' => 'No projects found for this vendor'], 404);
             }
 
             $fileName = 'Vendor_Projects_' . str_replace(' ', '_', $vendorName) . '_' . date('Y-m-d_H-i-s') . '.xlsx';
-            return Excel::download(new VendorProjectsExport($data, $vendorName), $fileName);
+            return Excel::download(new VendorProjectsExport($projects, $vendorName), $fileName);
         } catch (\Exception $e) {
             Log::error('Vendor Projects Excel Export Error: ' . $e->getMessage());
-            return response()->json(['success' => false, 'message' => 'Failed to export'], 500);
+            Log::error('Stack trace: ' . $e->getTraceAsString());
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to export: ' . $e->getMessage()
+            ], 500);
         }
     }
 
