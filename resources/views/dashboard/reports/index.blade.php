@@ -800,15 +800,6 @@
                     <div class="number" id="totalProjectsVendor">0</div>
                 </div>
             </div>
-            <div class="stat-card value">
-                <div class="icon">
-                    <i class="fas fa-dollar-sign"></i>
-                </div>
-                <div class="stat-card-content">
-                    <h5>Total Value</h5>
-                    <div class="number" id="totalValueVendor">0 SAR</div>
-                </div>
-            </div>
         </div>
 
         {{-- Vendor Projects Table --}}
@@ -1533,10 +1524,6 @@ $(document).ready(function() {
                     <div class="stat-box">
                         <h4 style="margin: 0 0 10px 0; color: #666;">Total Projects</h4>
                         <p style="font-size: 24px; font-weight: bold; margin: 5px 0; color: #28a745;">${totalProjects}</p>
-                    </div>
-                    <div class="stat-box">
-                        <h4 style="margin: 0 0 10px 0; color: #666;">Total Value</h4>
-                        <p style="font-size: 24px; font-weight: bold; color: #28a745; margin: 5px 0;">${totalValue}</p>
                     </div>
                 </div>
                 <table>
