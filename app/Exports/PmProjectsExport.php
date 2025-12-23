@@ -33,7 +33,7 @@ class PmProjectsExport implements FromCollection, WithHeadings, WithStyles, With
                 $index + 1,
                 $project['pr_number'] ?? 'N/A',
                 $project['name'] ?? 'N/A',
-                $project['customer'] ?? 'N/A',
+                $project['customer_name'] ?? 'N/A',
                 $project['value'] ?? 'N/A'
             ]);
         }

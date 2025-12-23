@@ -853,9 +853,8 @@
                                                 <i class="fas fa-project-diagram"></i> {{ $project->name }}
                                                 <span class="badge badge-light ml-2" style="font-size: 14px;">PR# {{ $project->pr_number }}</span>
                                             </h3>
-                                            {{-- Print & PDF Buttons --}}
-                                            <div style="display: flex; gap: 10px;">
-                                                {{-- Print Button --}}
+                                            {{-- Print Button --}}
+                                            <div>
                                                 <form action="{{ route('dashboard.print.filtered') }}" method="GET" target="_blank" style="display: inline; margin: 0;">
                                                     @foreach(request('filter', []) as $key => $value)
                                                         @if($value)
@@ -874,28 +873,6 @@
                                                                    cursor: pointer;
                                                                    font-size: 14px;">
                                                         <i class="fas fa-print"></i> Print
-                                                    </button>
-                                                </form>
-
-                                                {{-- PDF Button --}}
-                                                <form action="{{ route('dashboard.pdf.filtered') }}" method="GET" target="_blank" style="display: inline; margin: 0;">
-                                                    @foreach(request('filter', []) as $key => $value)
-                                                        @if($value)
-                                                            <input type="hidden" name="filter[{{ $key }}]" value="{{ $value }}">
-                                                        @endif
-                                                    @endforeach
-                                                    <button type="submit" class="btn"
-                                                            style="background: #dc3545;
-                                                                   color: white;
-                                                                   font-weight: 600;
-                                                                   padding: 10px 20px;
-                                                                   border-radius: 8px;
-                                                                   box-shadow: 0 2px 8px rgba(220, 53, 69, 0.3);
-                                                                   border: none;
-                                                                   transition: all 0.3s ease;
-                                                                   cursor: pointer;
-                                                                   font-size: 14px;">
-                                                        <i class="fas fa-file-pdf"></i> PDF
                                                     </button>
                                                 </form>
                                             </div>
@@ -1008,7 +985,7 @@
                                                         <i class="fas fa-calendar-check" style="color: #17a2b8; font-size: 20px; margin-right: 12px;"></i>
                                                         <div>
                                                             <small style="color: #6c757d; font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px;">Expected Completion Date</small>
-                                                            <h6 class="mb-0 mt-1" style="color: #2c3e50; font-weight: 600; font-size: 16px;">{{ $project->customer_po_deadline ?? 'Not Set' }}</h6>
+                                                            <h6 class="mb-0 mt-1" style="color: #2c3e50; font-weight: 600; font-size: 16px;">{{ $project->latestStatus && $project->latestStatus->date_time ? \Carbon\Carbon::parse($project->latestStatus->date_time)->format('d/m/Y (H:i)') : 'Not Set' }}</h6>
                                                         </div>
                                                     </div>
                                                 </div>

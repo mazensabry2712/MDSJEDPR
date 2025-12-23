@@ -34,8 +34,7 @@ class SupplierProjectsExport implements FromCollection, WithHeadings, WithStyles
                 $project['pr_number'] ?? 'N/A',
                 $project['name'] ?? 'N/A',
                 $project['po_number'] ?? 'N/A',
-                $project['po_value'] ?? 'N/A',
-                $project['all_ds'] ?? 'N/A'
+                $project['value'] ?? 'N/A'
             ]);
         }
 
@@ -48,9 +47,8 @@ class SupplierProjectsExport implements FromCollection, WithHeadings, WithStyles
             '#',
             'PR Number',
             'Project Name',
-            'PO Number',
-            'PO Value',
-            'All D/S'
+            'Order Number',
+            'Order Value'
         ];
     }
 

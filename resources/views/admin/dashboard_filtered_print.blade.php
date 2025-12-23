@@ -65,11 +65,11 @@
         .card-header {
             background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
             color: white;
-            padding: 8px 12px;
+            padding: 6px 10px;
         }
 
         .card-header h3 {
-            font-size: 12px;
+            font-size: 11px;
             margin: 0;
         }
 
@@ -85,20 +85,20 @@
 
         .card-body {
             background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
-            padding: 10px;
+            padding: 6px;
         }
 
         /* Info Grid */
         .info-grid {
             display: grid;
             grid-template-columns: repeat(5, 1fr);
-            gap: 6px;
-            margin-bottom: 10px;
+            gap: 5px;
+            margin-bottom: 6px;
         }
 
         .info-box {
             background: white;
-            padding: 8px;
+            padding: 6px;
             border-radius: 4px;
             border-top: 2px solid #667eea;
             box-shadow: 0 1px 4px rgba(0,0,0,0.08);
@@ -131,11 +131,11 @@
         /* Progress Section */
         .progress-section {
             background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
-            padding: 10px;
+            padding: 6px;
             border-radius: 8px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.08);
             border: 1px solid #e9ecef;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
         }
 
         .progress-header {
@@ -171,12 +171,12 @@
         /* Progress Bar */
         .progress-bar-container {
             background: #e9ecef;
-            height: 16px;
+            height: 12px;
             border-radius: 8px;
             overflow: hidden;
             position: relative;
             box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
-            margin-bottom: 8px;
+            margin-bottom: 5px;
         }
 
         .progress-bar-fill {
@@ -191,12 +191,12 @@
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 6px;
-            margin-bottom: 8px;
+            gap: 5px;
+            margin-bottom: 5px;
         }
 
         .stat-box {
-            padding: 8px;
+            padding: 6px;
             border-radius: 6px;
             border-left: 3px solid;
         }
@@ -258,14 +258,16 @@
         /* Details Sections */
         .details-grid {
             display: grid;
-            grid-template-columns: repeat(4, 1fr);
+            grid-template-columns: repeat(2, 1fr);
             gap: 5px;
+            margin-bottom: 10px;
         }
 
         .detail-card {
-            padding: 8px;
+            padding: 6px;
             border-radius: 6px;
             color: white;
+            overflow: visible;
         }
 
         .detail-card.tasks {
@@ -277,29 +279,36 @@
         }
 
         .detail-card.milestones {
-            background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);
+            background: linear-gradient(135deg, #ffc107 0%, #e0a800 100%);
         }
 
         .detail-card.invoices {
-            background: linear-gradient(135deg, #ffc107 0%, #e0a800 100%);
+            background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);
+        }
+
+        .detail-card.dns {
+            background: linear-gradient(135deg, #6f42c1 0%, #5a32a3 100%);
+        }
+
+        .detail-card.escalation {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
         }
 
         .detail-card .card-title {
             font-size: 7px;
             font-weight: 600;
             opacity: 0.9;
-            margin-bottom: 5px;
+            margin-bottom: 3px;
         }
 
         .detail-card .card-content {
             font-size: 7px;
             line-height: 1.4;
-            max-height: 60px;
-            overflow: hidden;
+            overflow: visible;
         }
 
         .detail-item {
-            padding: 3px 0;
+            padding: 2px 0;
             border-bottom: 1px solid rgba(255,255,255,0.15);
             display: flex;
             align-items: center;
@@ -313,9 +322,10 @@
         .detail-name {
             font-weight: 600;
             flex: 1;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
+            white-space: normal;
+            overflow: visible;
+            font-size: 7px;
+            word-wrap: break-word;
         }
 
         .detail-arrow {
@@ -325,11 +335,11 @@
         }
 
         .detail-assigned {
-            background: rgba(255,255,255,0.3);
-            padding: 2px 6px;
-            border-radius: 3px;
-            font-size: 6px;
-            font-weight: 600;
+            background: rgba(255,255,255,0.4);
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 8px;
+            font-weight: 700;
             white-space: nowrap;
         }
 
@@ -432,12 +442,14 @@
                     </div>
                     <div class="value">{{ $project->ppms->name ?? 'N/A' }}</div>
                 </div>
+                @if(!request('filter.pr_number_no_invoice'))
                 <div class="info-box value">
                     <div class="label">
                         <i class="fas fa-dollar-sign" style="color: #ffc107;"></i> Value
                     </div>
                     <div class="value">{{ number_format($project->value ?? 0, 0) }} SAR</div>
                 </div>
+                @endif
                 <div class="info-box date">
                     <div class="label">
                         <i class="fas fa-calendar-alt" style="color: #17a2b8;"></i> PO Date
@@ -473,23 +485,7 @@
                     <div class="date-label">
                         <i class="fas fa-calendar-check"></i> Expected Completion Date
                     </div>
-                    <div class="date-value">{{ $project->customer_po_deadline ?? 'Not Set' }}</div>
-                </div>
-
-                <!-- Stats Grid -->
-                <div class="stats-grid">
-                    <div class="stat-box pending">
-                        <div class="stat-label">
-                            <i class="fas fa-clock"></i> PENDING
-                        </div>
-                        <div class="stat-value">{{ $pendingTasks }}</div>
-                    </div>
-                    <div class="stat-box total">
-                        <div class="stat-label">
-                            <i class="fas fa-list"></i> TOTAL TASKS
-                        </div>
-                        <div class="stat-value">{{ $totalTasks }}</div>
-                    </div>
+                    <div class="date-value">{{ $project->latestStatus && $project->latestStatus->date_time ? \Carbon\Carbon::parse($project->latestStatus->date_time)->format('d/m/Y (H:i)') : 'Not Set' }}</div>
                 </div>
             </div>
 
@@ -500,7 +496,7 @@
                     <div class="card-title">Tasks</div>
                     <div class="card-content">
                         @php
-                            $pendingTasksList = $project->tasks->whereIn('status', ['Pending', 'pending', 'In Progress', 'in progress'])->take(4);
+                            $pendingTasksList = $project->tasks->whereIn('status', ['Pending', 'pending', 'In Progress', 'in progress']);
                         @endphp
                         @if($pendingTasksList->count() > 0)
                             @foreach($pendingTasksList as $task)
@@ -522,7 +518,7 @@
                     <div class="card-title">Risks</div>
                     <div class="card-content">
                         @php
-                            $risksList = $project->risks->take(4);
+                            $risksList = $project->risks;
                         @endphp
                         @if($risksList->count() > 0)
                             @foreach($risksList as $risk)
@@ -544,7 +540,7 @@
                     <div class="card-title">Milestones</div>
                     <div class="card-content">
                         @php
-                            $milestonesList = $project->milestones->take(4);
+                            $milestonesList = $project->milestones;
                         @endphp
                         @if($milestonesList->count() > 0)
                             @foreach($milestonesList as $milestone)
@@ -566,20 +562,61 @@
                     <div class="card-title">Invoices</div>
                     <div class="card-content">
                         @php
-                            $invoicesList = $project->invoices->take(4);
+                            $invoicesList = $project->invoices;
+                            $paidInvoices = $project->invoices->whereIn('status', ['Paid', 'paid'])->count();
                         @endphp
                         @if($invoicesList->count() > 0)
                             @foreach($invoicesList as $invoice)
                                 <div class="detail-item">
                                     <span class="detail-name">{{ $invoice->invoice_number ?? 'Invoice' }}</span>
                                     <i class="fas fa-long-arrow-alt-right detail-arrow"></i>
-                                    <span class="detail-assigned">{{ $invoice->status ?? 'N/A' }}</span>
+                                    <span class="detail-assigned">{{ number_format($invoice->value ?? 0) }} SAR</span>
                                 </div>
                             @endforeach
                         @else
                             <div class="no-data">No invoices</div>
                         @endif
-                        <div class="detail-summary">{{ $project->invoices->count() }} Total</div>
+                        <div class="detail-summary">{{ $paidInvoices }}/{{ $project->invoices->count() }} Paid</div>
+                    </div>
+                </div>
+
+                {{-- DNs (Delivery Notes) --}}
+                <div class="detail-card dns">
+                    <div class="card-title">DNs</div>
+                    <div class="card-content">
+                        @php
+                            $dnsList = $project->dns ?? collect([]);
+                            $dnsCount = is_countable($dnsList) ? $dnsList->count() : 0;
+                        @endphp
+                        @if($dnsCount > 0)
+                            <div style="display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 6px;">
+                                @foreach($dnsList as $dn)
+                                    <div style="background: rgba(111, 66, 193, 0.15); padding: 4px 8px; border-radius: 4px; font-weight: 600; font-size: 7px; text-align: center; border: 1px solid rgba(111, 66, 193, 0.3);">
+                                        {{ $dn->dn_number ?? 'N/A' }}
+                                    </div>
+                                @endforeach
+                            </div>
+                        @else
+                            <div class="no-data">No DNs</div>
+                        @endif
+                        <div class="detail-summary">{{ $dnsCount }} Total</div>
+                    </div>
+                </div>
+
+                {{-- Escalation --}}
+                <div class="detail-card escalation">
+                    <div class="card-title">Escalation</div>
+                    <div class="card-content">
+                        @if($project->customer_contact_details || $project->aams)
+                            <div class="detail-item">
+                                <span class="detail-name">{{ $project->customer_contact_details ?? 'N/A' }}</span>
+                                <i class="fas fa-long-arrow-alt-right detail-arrow"></i>
+                                <span class="detail-assigned">{{ $project->aams->name ?? 'N/A' }}</span>
+                            </div>
+                        @else
+                            <div class="no-data">No contact info</div>
+                        @endif
+                        <div class="detail-summary">Contact → AM</div>
                     </div>
                 </div>
             </div>

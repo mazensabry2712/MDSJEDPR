@@ -258,7 +258,7 @@
         /* Details Sections */
         .details-grid {
             display: grid;
-            grid-template-columns: repeat(4, 1fr);
+            grid-template-columns: repeat(3, 1fr);
             gap: 5px;
         }
 
@@ -282,6 +282,14 @@
 
         .detail-card.invoices {
             background: linear-gradient(135deg, #ffc107 0%, #e0a800 100%);
+        }
+
+        .detail-card.dns {
+            background: linear-gradient(135deg, #6f42c1 0%, #5a32a3 100%);
+        }
+
+        .detail-card.escalation {
+            background: linear-gradient(135deg, #fd7e14 0%, #e8590c 100%);
         }
 
         .detail-card .card-title {
@@ -473,23 +481,7 @@
                     <div class="date-label">
                         <i class="fas fa-calendar-check"></i> Expected Completion Date
                     </div>
-                    <div class="date-value">{{ $project->customer_po_deadline ?? 'Not Set' }}</div>
-                </div>
-
-                <!-- Stats Grid -->
-                <div class="stats-grid">
-                    <div class="stat-box pending">
-                        <div class="stat-label">
-                            <i class="fas fa-clock"></i> PENDING
-                        </div>
-                        <div class="stat-value">{{ $pendingTasks }}</div>
-                    </div>
-                    <div class="stat-box total">
-                        <div class="stat-label">
-                            <i class="fas fa-list"></i> TOTAL TASKS
-                        </div>
-                        <div class="stat-value">{{ $totalTasks }}</div>
-                    </div>
+                    <div class="date-value">{{ $project->latestStatus && $project->latestStatus->date_time ? \Carbon\Carbon::parse($project->latestStatus->date_time)->format('d/m/Y (H:i)') : 'Not Set' }}</div>
                 </div>
             </div>
 
@@ -500,7 +492,7 @@
                     <div class="card-title">Tasks</div>
                     <div class="card-content">
                         @php
-                            $pendingTasksList = $project->tasks->whereIn('status', ['Pending', 'pending', 'In Progress', 'in progress'])->take(4);
+                            $pendingTasksList = $project->tasks->whereIn('status', ['Pending', 'pending', 'In Progress', 'in progress']);
                         @endphp
                         @if($pendingTasksList->count() > 0)
                             @foreach($pendingTasksList as $task)
@@ -522,7 +514,7 @@
                     <div class="card-title">Risks</div>
                     <div class="card-content">
                         @php
-                            $risksList = $project->risks->take(4);
+                            $risksList = $project->risks;
                         @endphp
                         @if($risksList->count() > 0)
                             @foreach($risksList as $risk)
@@ -544,7 +536,7 @@
                     <div class="card-title">Milestones</div>
                     <div class="card-content">
                         @php
-                            $milestonesList = $project->milestones->take(4);
+                            $milestonesList = $project->milestones;
                         @endphp
                         @if($milestonesList->count() > 0)
                             @foreach($milestonesList as $milestone)
@@ -566,20 +558,61 @@
                     <div class="card-title">Invoices</div>
                     <div class="card-content">
                         @php
-                            $invoicesList = $project->invoices->take(4);
+                            $invoicesList = $project->invoices;
+                            $paidInvoices = $project->invoices->whereIn('status', ['Paid', 'paid'])->count();
                         @endphp
                         @if($invoicesList->count() > 0)
                             @foreach($invoicesList as $invoice)
                                 <div class="detail-item">
                                     <span class="detail-name">{{ $invoice->invoice_number ?? 'Invoice' }}</span>
                                     <i class="fas fa-long-arrow-alt-right detail-arrow"></i>
-                                    <span class="detail-assigned">{{ $invoice->status ?? 'N/A' }}</span>
+                                    <span class="detail-assigned">{{ number_format($invoice->value ?? 0) }} SAR</span>
                                 </div>
                             @endforeach
                         @else
                             <div class="no-data">No invoices</div>
                         @endif
-                        <div class="detail-summary">{{ $project->invoices->count() }} Total</div>
+                        <div class="detail-summary">{{ $paidInvoices }}/{{ $project->invoices->count() }} Paid</div>
+                    </div>
+                </div>
+
+                {{-- DNs (Delivery Notes) --}}
+                <div class="detail-card dns">
+                    <div class="card-title">DNs</div>
+                    <div class="card-content">
+                        @php
+                            $dnsList = $project->dns ?? collect([]);
+                            $dnsCount = is_countable($dnsList) ? $dnsList->count() : 0;
+                        @endphp
+                        @if($dnsCount > 0)
+                            <div style="display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 6px;">
+                                @foreach($dnsList as $dn)
+                                    <div style="background: rgba(255, 255, 255, 0.2); padding: 4px 8px; border-radius: 4px; font-weight: 600; font-size: 7px; text-align: center; border: 1px solid rgba(255, 255, 255, 0.3);">
+                                        {{ $dn->dn_number ?? 'N/A' }}
+                                    </div>
+                                @endforeach
+                            </div>
+                        @else
+                            <div class="no-data">No DNs</div>
+                        @endif
+                        <div class="detail-summary">{{ $dnsCount }} Total</div>
+                    </div>
+                </div>
+
+                {{-- Escalation --}}
+                <div class="detail-card escalation">
+                    <div class="card-title">Escalation</div>
+                    <div class="card-content">
+                        @if($project->customer_contact_details || $project->aams)
+                            <div class="detail-item">
+                                <span class="detail-name">{{ $project->customer_contact_details ?? 'N/A' }}</span>
+                                <i class="fas fa-long-arrow-alt-right detail-arrow"></i>
+                                <span class="detail-assigned">{{ $project->aams->name ?? 'N/A' }}</span>
+                            </div>
+                        @else
+                            <div class="no-data">No contact info</div>
+                        @endif
+                        <div class="detail-summary">Contact → AM</div>
                     </div>
                 </div>
             </div>

@@ -9,6 +9,7 @@ use App\Models\aams;
 use App\Models\vendors;
 use App\Models\Ds;
 use App\Models\Cust;
+use App\Models\Ppos;
 use App\Exports\CustomerProjectsExport;
 use App\Exports\VendorProjectsExport;
 use App\Exports\SupplierProjectsExport;
@@ -290,32 +291,34 @@ class ReportController extends Controller
                 ], 404);
             }
 
-            // Get projects for this supplier through pivot table
-            $projects = Project::whereHas('deliverySpecialists', function($query) use ($supplier) {
-                $query->where('ds_id', $supplier->id);
-            })
-            ->with(['cust:id,name', 'deliverySpecialists:id,dsname'])
-            ->select('id', 'pr_number', 'name', 'value', 'customer_po', 'customer_po_deadline', 'cust_id')
-            ->orderBy('created_at', 'desc')
-            ->get();
+            // Get PPOs for this supplier from ppos table
+            $ppos = Ppos::where('dsname', $supplier->id)
+                ->with(['project:id,pr_number,name', 'ds:id,dsname'])
+                ->get();
 
-            // Calculate total value
-            $totalValue = $projects->sum('value');
-
-            // Format projects
-            $formattedProjects = $projects->map(function($project) {
+            // Group by po_number and sum values for each order
+            $groupedPpos = $ppos->groupBy('po_number')->map(function($group) {
+                $first = $group->first();
                 return [
-                    'id' => $project->id,
-                    'pr_number' => $project->pr_number ?? 'N/A',
-                    'name' => $project->name ?? 'Untitled Project',
-                    'customer_name' => $project->cust->name ?? 'N/A',
-                    'value' => number_format($project->value ?? 0, 2),
-                    'customer_po' => $project->customer_po ?? 'N/A',
-                    'po_value' => number_format($project->value ?? 0, 2),
-                    'all_ds' => $project->deliverySpecialists->pluck('dsname')->implode(', '),
-                    'deadline' => $project->customer_po_deadline
-                        ? \Carbon\Carbon::parse($project->customer_po_deadline)->format('Y-m-d')
-                        : null,
+                    'id' => $first->id,
+                    'pr_number' => $first->project->pr_number ?? 'N/A',
+                    'name' => $first->project->name ?? 'Untitled Project',
+                    'po_number' => $first->po_number ?? 'N/A',
+                    'value' => $group->sum('value'), // Sum all values for this po_number
+                ];
+            })->values(); // Reset keys to sequential
+
+            // Calculate total value from grouped ppos
+            $totalValue = $groupedPpos->sum('value');
+
+            // Format PPOs data
+            $formattedProjects = $groupedPpos->map(function($ppo) {
+                return [
+                    'id' => $ppo['id'],
+                    'pr_number' => $ppo['pr_number'],
+                    'name' => $ppo['name'],
+                    'po_number' => $ppo['po_number'],
+                    'value' => number_format($ppo['value'], 2),
                 ];
             });
 
@@ -324,11 +327,9 @@ class ReportController extends Controller
                 'supplier' => [
                     'id' => $supplier->id,
                     'name' => $supplier->dsname,
-                    'abb' => 'N/A',
-                    'type' => 'Supplier',
                 ],
                 'projects' => $formattedProjects,
-                'total_projects' => $projects->count(),
+                'total_projects' => $formattedProjects->count(),
                 'total_value' => $totalValue
             ]);
         } catch (\Illuminate\Validation\ValidationException $e) {

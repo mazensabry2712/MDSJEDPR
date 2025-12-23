@@ -189,7 +189,8 @@ class DashboardController extends Controller
             'tasks',
             'risks',
             'milestones',
-            'invoices'
+            'invoices',
+            'dns'
         ]);
 
         // Apply manual filters
@@ -231,7 +232,8 @@ class DashboardController extends Controller
             'tasks',
             'risks',
             'milestones',
-            'invoices'
+            'invoices',
+            'dns'
         ]);
 
         // Apply manual filters
