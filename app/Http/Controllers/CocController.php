@@ -229,7 +229,7 @@ class CocController extends Controller
     public function printView()
     {
         $coc = Coc::with('project:id,pr_number,name')->get();
-        return view('dashboard.coc.print', compact('coc'));
+        return view('dashboard.CoC.print', compact('coc'));
     }
 
     /**
