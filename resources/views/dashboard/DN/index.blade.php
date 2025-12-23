@@ -317,7 +317,7 @@
                                     <th>PR number</th>
                                     <th>Project Name</th>
                                     <th>DN Copy</th>
-                                    <th>Status</th>
+                                    <th>Date</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -386,12 +386,12 @@
                                             @endif
                                         </td>
                                         <td class="dn-details">
-                                            @if($dnnn->status && trim($dnnn->status) !== '')
+                                            @if($dnnn->date)
                                                 <div class="text-wrap">
-                                                    {{ $dnnn->status }}
+                                                    {{ \Carbon\Carbon::parse($dnnn->date)->format('d/m/Y') }}
                                                 </div>
                                             @else
-                                                <span class="badge badge-secondary">No Status</span>
+                                                <span class="badge badge-secondary">No Date</span>
                                             @endif
                                         </td>
                                     </tr>
@@ -470,7 +470,7 @@
 
                 // Create workbook data in Excel XML format
                 let excelData = [];
-                excelData.push(['#', 'DN Number', 'PR Number', 'Project Name', 'Status']); // Headers
+                excelData.push(['#', 'DN Number', 'PR Number', 'Project Name', 'Date']); // Headers
 
                 // Get all data from DataTable
                 dataTable.rows({ search: 'applied' }).every(function(rowIdx) {
@@ -478,11 +478,11 @@
                     const cells = $(rowNode).find('td');
 
                     excelData.push([
-                        cells.eq(0).text().trim(),
-                        cells.eq(2).text().trim(),
-                        cells.eq(3).text().trim(),
-                        cells.eq(4).text().trim(),
-                        cells.eq(6).text().trim()
+                        cells.eq(0).text().trim(),    // #
+                        cells.eq(2).text().trim(),    // DN Number
+                        cells.eq(3).text().trim(),    // PR Number
+                        cells.eq(4).text().trim(),    // Project Name
+                        cells.eq(6).text().trim()     // Date
                     ]);
                 });
 
@@ -687,7 +687,7 @@
                     { width: "15%", targets: 3 },  // PR number column
                     { width: "20%", targets: 4 },  // Project Name column
                     { width: "10%", targets: 5, orderable: false, searchable: false }, // DN Copy column (تم تعطيل الفرز والبحث)
-                    { width: "20%", targets: 6 }   // Status column
+                    { width: "20%", targets: 6 }   // Date column
                 ],
                 language: {
                     searchPlaceholder: 'Search...',

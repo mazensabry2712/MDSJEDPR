@@ -146,8 +146,8 @@
     <div class="breadcrumb-header justify-content-between">
         <div class="my-auto">
             <div class="d-flex">
-                <h4 class="content-title mb-0 my-auto">Add Project</h4><span class="text-muted mt-1 tx-13 mr-2 mb-0">/
-                    Projects</span>
+                <h4 class="content-title mb-0 my-auto">Add Delivery Note</h4><span class="text-muted mt-1 tx-13 mr-2 mb-0">/
+                    DN</span>
             </div>
         </div>
     </div>
@@ -230,10 +230,10 @@
                             </div>
 
                             <div class="col">
-                                <label for="status" class="control-label">Status </label>
-                                <input type="text" class="form-control" id="status" name="status"
-                                    value="{{ old('status') }}"
-                                    title="   Please enter the  status  ">
+                                <label for="date" class="control-label">Date </label>
+                                <input type="date" class="form-control" id="date" name="date"
+                                    value="{{ old('date') }}"
+                                    title="Please enter the date">
                             </div>
                         </div>
                         <div class="row mt-4">

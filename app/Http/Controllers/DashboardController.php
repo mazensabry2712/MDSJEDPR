@@ -63,19 +63,10 @@ class DashboardController extends Controller
         if ($request->has('filter') && !empty(array_filter($request->filter))) {
             $hasFilters = true;
 
-            // Start with base query - Load all relationships
-            $query = Project::query()->with([
-                'ppms',
-                'aams',
-                'cust',
-                'latestStatus',
-                'tasks',
-                'risks',
-                'milestones',
-                'invoices'
-            ]);
+            // Start with base query - Load relationships selectively
+            $query = Project::query();
 
-            // Apply manual filters
+            // Apply manual filters first
             $filters = $request->filter;
 
             // Filter by PR Number
@@ -93,7 +84,28 @@ class DashboardController extends Controller
                 $query->where('name', $filters['project_name']);
             }
 
-            $filteredProjects = $query->get();
+            // Load relationships after filtering for better performance
+            $filteredProjects = $query->with([
+                'ppms:id,name',
+                'aams:id,name',
+                'cust:id,name',
+                'latestStatus',
+                'tasks' => function($q) {
+                    $q->select('id', 'pr_number', 'details', 'assigned', 'status');
+                },
+                'risks' => function($q) {
+                    $q->select('id', 'pr_number', 'risk', 'impact', 'status');
+                },
+                'milestones' => function($q) {
+                    $q->select('id', 'pr_number', 'milestone', 'status');
+                },
+                'invoices' => function($q) {
+                    $q->select('id', 'pr_number', 'invoice_number', 'value', 'status');
+                },
+                'dns' => function($q) {
+                    $q->select('id', 'pr_number', 'dn_number');
+                }
+            ])->get();
         }
 
         return view("admin.dashboard", compact(

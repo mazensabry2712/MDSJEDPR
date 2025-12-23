@@ -400,8 +400,8 @@
 
 <!-- Page Header -->
 <div class="page-header">
-    <h1><i class="fas fa-project-diagram"></i> Filtered Dashboard Report</h1>
-    <div class="subtitle">Project Progress Overview</div>
+    <h1><i class="fas fa-project-diagram"></i>Project Progress Overview</h1>
+    {{-- <div class="subtitle"></div> --}}
     <div class="print-date">
         <i class="fas fa-calendar"></i> Printed on: {{ now()->format('Y-m-d H:i:s') }}
     </div>
@@ -485,7 +485,7 @@
                     <div class="date-label">
                         <i class="fas fa-calendar-check"></i> Expected Completion Date
                     </div>
-                    <div class="date-value">{{ $project->latestStatus && $project->latestStatus->date_time ? \Carbon\Carbon::parse($project->latestStatus->date_time)->format('d/m/Y (H:i)') : 'Not Set' }}</div>
+                    <div class="date-value">{{ $project->latestStatus && $project->latestStatus->expected_completion ? \Carbon\Carbon::parse($project->latestStatus->expected_completion)->format('d/m/Y') : 'Not Set' }}</div>
                 </div>
             </div>
 
@@ -558,6 +558,7 @@
                 </div>
 
                 {{-- Invoices --}}
+                @if(!request('filter.pr_number_no_invoice'))
                 <div class="detail-card invoices">
                     <div class="card-title">Invoices</div>
                     <div class="card-content">
@@ -579,6 +580,7 @@
                         <div class="detail-summary">{{ $paidInvoices }}/{{ $project->invoices->count() }} Paid</div>
                     </div>
                 </div>
+                @endif
 
                 {{-- DNs (Delivery Notes) --}}
                 <div class="detail-card dns">

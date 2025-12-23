@@ -326,12 +326,12 @@
                             <div class="col-md-10">
                                 <h1 class="customer-name">DN #{{ $dn->dn_number }}</h1>
                                 <div class="customer-type">
-                                    @if($dn->status)
+                                    @if($dn->date)
                                         <span class="type-badge type-active">
-                                            {{ $dn->status }}
+                                            {{ \Carbon\Carbon::parse($dn->date)->format('d/m/Y') }}
                                         </span>
                                     @else
-                                        <span class="type-badge type-default">No Status</span>
+                                        <span class="type-badge type-default">No Date</span>
                                     @endif
                                 </div>
                                 @if($dn->project && $dn->project->pr_number)
@@ -386,11 +386,11 @@
 
                                 <div class="info-item">
                                     <div class="info-icon" style="background-color: #28a745;">
-                                        <i class="fas fa-info-circle"></i>
+                                        <i class="fas fa-calendar-alt"></i>
                                     </div>
                                     <div class="info-content">
-                                        <div class="info-label">Status</div>
-                                        <div class="info-value">{{ $dn->status ?: 'No status provided' }}</div>
+                                        <div class="info-label">Date</div>
+                                        <div class="info-value">{{ $dn->date ? \Carbon\Carbon::parse($dn->date)->format('d/m/Y') : 'No date provided' }}</div>
                                     </div>
                                 </div>
 
@@ -551,7 +551,7 @@
                 ['DN Number', '{{ $dn->dn_number }}'],
                 ['Project Number', '{{ $dn->project->pr_number ?? "Not assigned" }}'],
                 ['Project Name', '{{ $dn->project->name ?? "No name available" }}'],
-                ['Status', '{{ $dn->status ?: "No status" }}'],
+                ['Date', '{{ $dn->date ? \Carbon\Carbon::parse($dn->date)->format("d/m/Y") : "No date" }}'],
                 ['Created Date', '{{ $dn->created_at ? $dn->created_at->format("d M Y, H:i") : "Not available" }}'],
                 ['Last Updated', '{{ $dn->updated_at ? $dn->updated_at->format("d M Y, H:i") : "Not available" }}']
             ];
@@ -639,7 +639,7 @@
                     <table class="info-table">
                         <tr><th>DN Number</th><td>{{ $dn->dn_number }}</td></tr>
                         <tr><th>Project Number</th><td>{{ $dn->project->pr_number ?? "Not assigned" }}</td></tr>
-                        <tr><th>Status</th><td>{{ $dn->status ?: "No status provided" }}</td></tr>
+                        <tr><th>Date</th><td>{{ $dn->date ? \Carbon\Carbon::parse($dn->date)->format('d/m/Y') : "No date provided" }}</td></tr>
                         <tr><th>Created Date</th><td>{{ $dn->created_at ? $dn->created_at->format('d M Y, H:i') : "Not available" }}</td></tr>
                         <tr><th>Last Updated</th><td>{{ $dn->updated_at ? $dn->updated_at->format('d M Y, H:i') : "Not available" }}</td></tr>
                         <tr><th>File Attachment</th><td>{{ $dn->dn_copy && file_exists(public_path($dn->dn_copy)) ? "Available" : "No file uploaded" }}</td></tr>
@@ -786,11 +786,11 @@
 
                 <div class="info-item">
                     <div class="info-icon" style="background-color: #ffc107;">
-                        <i class="fas fa-info-circle"></i>
+                        <i class="fas fa-calendar-alt"></i>
                     </div>
                     <div class="info-content">
-                        <div class="info-label">Status</div>
-                        <div class="info-value">{{ $dn->status ?: 'No status provided' }}</div>
+                        <div class="info-label">Date</div>
+                        <div class="info-value">{{ $dn->date ? \Carbon\Carbon::parse($dn->date)->format('d/m/Y') : 'No date provided' }}</div>
                     </div>
                 </div>
 

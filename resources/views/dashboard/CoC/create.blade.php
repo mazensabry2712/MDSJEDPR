@@ -144,7 +144,7 @@
         <div class="my-auto">
             <div class="d-flex">
                 <h4 class="content-title mb-0 my-auto">Dashboard</h4>
-                <span class="text-muted mt-1 tx-13 mr-2 mb-0">/ Certificate of Compliance</span>
+                <span class="text-muted mt-1 tx-13 mr-2 mb-0">/ Certificate of Compilation</span>
                 <span class="text-muted mt-1 tx-13 mr-2 mb-0">/ Add New</span>
             </div>
         </div>
@@ -163,7 +163,7 @@
         <div class="col-lg-12 col-md-12">
             <div class="card">
                 <div class="card-header">
-                    <div class="card-title">Add New Certificate of Compliance</div>
+                    <div class="card-title">Add New Certificate of Compilation</div>
                 </div>
                 <div class="card-body">
                     <form action="{{ route('coc.store') }}" method="post" enctype="multipart/form-data">

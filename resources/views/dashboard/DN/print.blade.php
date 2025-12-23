@@ -145,7 +145,7 @@
                 <th>DN Number</th>
                 <th>PR Number</th>
                 <th>Project Name</th>
-                <th>Status</th>
+                <th>Date</th>
             </tr>
         </thead>
         <tbody>
@@ -161,7 +161,7 @@
                             <span class="badge badge-secondary">No name available</span>
                         @endif
                     </td>
-                    <td>{{ $item->status }}</td>
+                    <td>{{ $item->date ? \Carbon\Carbon::parse($item->date)->format('d/m/Y') : 'N/A' }}</td>
                 </tr>
             @empty
                 <tr>

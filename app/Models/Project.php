@@ -66,7 +66,9 @@ class Project extends Model
     // للحصول على آخر حالة للمشروع
     public function latestStatus()
     {
-        return $this->hasOne(Pstatus::class, 'pr_number', 'id')->latestOfMany();
+        return $this->hasOne(Pstatus::class, 'pr_number', 'id')
+            ->orderBy('expected_completion', 'desc')
+            ->orderBy('id', 'desc');
     }
 
     // علاقات إضافية (Tasks, Milestones, Invoices, Risks)

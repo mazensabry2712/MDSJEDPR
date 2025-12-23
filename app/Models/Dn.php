@@ -16,7 +16,7 @@ class Dn extends Model
         'dn_number',
         'pr_number',
         'dn_copy',
-        'status',
+        'date',
     ];
 
     public function project()

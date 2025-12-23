@@ -112,7 +112,7 @@
     <div class="breadcrumb-header justify-content-between no-print">
         <div class="my-auto">
             <div class="d-flex">
-                <h4 class="content-title mb-0 my-auto">Certificate of Compliance</h4>
+                <h4 class="content-title mb-0 my-auto">Certificate of Compilation</h4>
                 <span class="text-muted mt-1 tx-13 mr-2 mb-0">/ View</span>
             </div>
         </div>
@@ -128,7 +128,7 @@
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
                             <h3 class="mb-2">
-                                <i class="fas fa-certificate mr-2"></i>Certificate of Compliance
+                                <i class="fas fa-certificate mr-2"></i>Certificate of Compilation
                             </h3>
                             <p class="mb-0" style="opacity: 0.9;">
                                 View complete details and certificate file
@@ -209,7 +209,7 @@
                         @if($coc->coc_copy && file_exists(public_path('../storge/' . $coc->coc_copy)))
                             <div class="file-preview">
                                 @if($isImage)
-                                    <a href="{{ asset('../storge/' . $coc->coc_copy) }}" data-lightbox="coc-file" data-title="Certificate of Compliance">
+                                    <a href="{{ asset('../storge/' . $coc->coc_copy) }}" data-lightbox="coc-file" data-title="Certificate of Compilation">
                                         <img src="{{ asset('../storge/' . $coc->coc_copy) }}" alt="CoC File">
                                     </a>
                                     <p class="mt-3 text-muted">
@@ -331,7 +331,7 @@
                     @method('DELETE')
                     <input type="hidden" name="id" value="{{ $coc->id }}">
                     <div class="modal-body">
-                        <p>Are you sure you want to delete this Certificate of Compliance?</p>
+                        <p>Are you sure you want to delete this Certificate of Compilation?</p>
                         <div class="alert alert-warning">
                             <strong>Project:</strong> {{ $coc->project->name ?? 'N/A' }}
                         </div>
@@ -368,7 +368,7 @@
             const doc = new jsPDF();
 
             doc.setFontSize(18);
-            doc.text('Certificate of Compliance', 15, 15);
+            doc.text('Certificate of Compilation', 15, 15);
 
             doc.setFontSize(12);
             let y = 30;
@@ -388,7 +388,7 @@
         function exportToExcel() {
             const wb = XLSX.utils.book_new();
             const data = [
-                ['Certificate of Compliance Details'],
+                ['Certificate of Compilation Details'],
                 [],
                 ['PR Number', '{{ $coc->project->pr_number ?? "N/A" }}'],
                 ['Project Name', '{{ $coc->project->name ?? "N/A" }}'],
@@ -405,7 +405,7 @@
         function shareContent() {
             if (navigator.share) {
                 navigator.share({
-                    title: 'Certificate of Compliance',
+                    title: 'Certificate of Compilation',
                     text: 'CoC for {{ $coc->project->name ?? "Project" }}',
                     url: window.location.href
                 }).catch(err => console.log('Error sharing:', err));

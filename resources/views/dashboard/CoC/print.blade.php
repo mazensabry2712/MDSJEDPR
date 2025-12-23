@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Certificate of Compliance - Print</title>
+    <title>Certificate of Compilation - Print</title>
     <style>
         * {
             margin: 0;
@@ -136,7 +136,7 @@
 
     <div class="header">
         <div class="system-name">MDSJEDPR</div>
-        <div class="title">Certificate of Compliance Management</div>
+        <div class="title">Certificate of Compilation Management</div>
         <div class="date">Generated: {{ date('m/d/Y, g:i:s A') }}</div>
     </div>
 

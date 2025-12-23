@@ -37,7 +37,7 @@ class DnExport implements FromCollection, WithHeadings, WithMapping, WithStyles,
             'DN Number',
             'PR Number',
             'Project Name',
-            'Status'
+            'Date'
         ];
     }
 
@@ -54,7 +54,7 @@ class DnExport implements FromCollection, WithHeadings, WithMapping, WithStyles,
             $dn->dn_number ?? 'N/A',
             $dn->project && $dn->project->pr_number ? $dn->project->pr_number : 'N/A',
             $dn->project && $dn->project->name ? $dn->project->name : 'No project assigned',
-            $dn->status ?? 'N/A'
+            $dn->date ? \Carbon\Carbon::parse($dn->date)->format('d/m/Y') : 'N/A'
         ];
     }
 
@@ -108,7 +108,7 @@ class DnExport implements FromCollection, WithHeadings, WithMapping, WithStyles,
             'B' => 15, // DN Number
             'C' => 15, // PR Number
             'D' => 35, // Project Name
-            'E' => 20, // Status
+            'E' => 20, // Date
         ];
     }
 

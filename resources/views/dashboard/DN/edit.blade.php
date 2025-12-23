@@ -246,10 +246,10 @@
                             </div>
 
                             <div class="col">
-                                <label for="status" class="control-label">Status </label>
-                                <input type="text" class="form-control" id="status" name="status"
-                                    title="   Please enter the  status  "
-                                    value="{{ old('status', $dn->status) }}">
+                                <label for="date" class="control-label">Date </label>
+                                <input type="date" class="form-control" id="date" name="date"
+                                    title="Please enter the date"
+                                    value="{{ old('date', $dn->date) }}">
                             </div>
                         </div>
                         <div class="row mt-4">

@@ -1,6 +1,6 @@
 @extends('layouts.master')
 @section('title')
-    Certificate of Compliance | MDSJEDPR
+    Certificate of Compilation | MDSJEDPR
 @stop
 @section('css')
     <link href="{{ URL::asset('assets/plugins/datatable/css/dataTables.bootstrap4.min.css') }}" rel="stylesheet" />
@@ -221,7 +221,7 @@
             }
 
             body:before {
-                content: "Certificate of Compliance Report";
+                content: "Certificate of Compilation Report";
                 display: block;
                 text-align: center;
                 font-size: 20pt;
@@ -258,7 +258,7 @@
     <div class="breadcrumb-header justify-content-between">
         <div class="my-auto">
             <div class="d-flex">
-                <h4 class="content-title mb-0 my-auto">Certificate of Compliance</h4><span class="text-muted mt-1 tx-13 mr-2 mb-0">/ All Certificates</span>
+                <h4 class="content-title mb-0 my-auto">Certificate of Compilation</h4><span class="text-muted mt-1 tx-13 mr-2 mb-0">/ All Certificates</span>
             </div>
         </div>
         <div class="d-flex my-xl-auto right-content">
@@ -324,7 +324,7 @@
                 <div class="card-header pb-0">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
-                            <h6 class="card-title mb-0">Certificate of Compliance Management</h6>
+                            <h6 class="card-title mb-0">Certificate of Compilation Management</h6>
                         </div>
                         <div>
                             <div class="d-flex align-items-center">
@@ -467,7 +467,7 @@
         <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content modal-content-demo">
                 <div class="modal-header">
-                    <h6 class="modal-title">Delete Certificate of Compliance</h6>
+                    <h6 class="modal-title">Delete Certificate of Compilation</h6>
                     <button aria-label="Close" class="close" data-dismiss="modal" type="button">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -476,7 +476,7 @@
                     {{ method_field('delete') }}
                     {{ csrf_field() }}
                     <div class="modal-body">
-                        <p>Are you sure you want to delete this Certificate of Compliance?</p><br>
+                        <p>Are you sure you want to delete this Certificate of Compilation?</p><br>
                         <input type="hidden" name="id" id="id" value="">
                         <div class="form-group">
                             <label for="project_name">Project:</label>
@@ -591,7 +591,7 @@
                 });
 
                 // Build Excel XML content with escaped characters
-                let worksheet = '<ss:Worksheet ss:Name="Certificate of Compliance"><ss:Table>';
+                let worksheet = '<ss:Worksheet ss:Name="Certificate of Compilation"><ss:Table>';
 
                 excelData.forEach((row, rowIndex) => {
                     worksheet += '<ss:Row>';

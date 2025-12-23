@@ -42,14 +42,15 @@ class DnController extends Controller
             'dn_number' => 'required|string|max:255',
             'pr_number' => 'required|exists:projects,id',
             'dn_copy' => 'nullable|mimes:pdf,jpg,png,jpeg|max:2048',
-            'status' => 'required|string|max:500',
+            'date' => 'required|date',
         ], [
             'dn_number.required' => 'DN Number is required',
             'pr_number.required' => 'PR Number is required',
             'pr_number.exists' => 'Selected PR Number does not exist',
             'dn_copy.mimes' => 'File must be PDF, JPG, PNG, or JPEG format',
             'dn_copy.max' => 'File size must not exceed 2MB',
-            'status.required' => 'Status is required',
+            'date.required' => 'Date is required',
+            'date.date' => 'Date must be a valid date',
         ]);
 
         if ($request->hasFile('dn_copy')) {
@@ -108,14 +109,15 @@ class DnController extends Controller
             'dn_number' => 'required|string|max:255',
             'pr_number' => 'required|exists:projects,id',
             'dn_copy' => 'nullable|mimes:pdf,jpg,png,jpeg|max:2048',
-            'status' => 'required|string|max:500',
+            'date' => 'required|date',
         ], [
             'dn_number.required' => 'DN Number is required',
             'pr_number.required' => 'PR Number is required',
             'pr_number.exists' => 'Selected PR Number does not exist',
             'dn_copy.mimes' => 'File must be PDF, JPG, PNG, or JPEG format',
             'dn_copy.max' => 'File size must not exceed 2MB',
-            'status.required' => 'Status is required',
+            'date.required' => 'Date is required',
+            'date.date' => 'Date must be a valid date',
         ]);
 
         if ($request->hasFile('dn_copy')) {
@@ -224,7 +226,7 @@ class DnController extends Controller
         $pdf->Cell($widths[1], 10, 'DN Number', 1, 0, 'L', true);
         $pdf->Cell($widths[2], 10, 'PR Number', 1, 0, 'L', true);
         $pdf->Cell($widths[3], 10, 'Project Name', 1, 0, 'L', true);
-        $pdf->Cell($widths[4], 10, 'Status', 1, 1, 'L', true);
+        $pdf->Cell($widths[4], 10, 'Date', 1, 1, 'L', true);
 
         // Table content
         $pdf->SetFont('helvetica', '', 9);
@@ -242,7 +244,7 @@ class DnController extends Controller
             $pdf->Cell($widths[1], 10, $item->dn_number, 1, 0, 'L', true);
             $pdf->Cell($widths[2], 10, $item->project->pr_number ?? 'N/A', 1, 0, 'L', true);
             $pdf->Cell($widths[3], 10, $item->project->name ?? 'N/A', 1, 0, 'L', true);
-            $pdf->Cell($widths[4], 10, $item->status, 1, 1, 'L', true);
+            $pdf->Cell($widths[4], 10, $item->date ? \Carbon\Carbon::parse($item->date)->format('d/m/Y') : 'N/A', 1, 1, 'L', true);
 
             $fill = !$fill;
         }

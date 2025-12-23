@@ -440,12 +440,14 @@
                     </div>
                     <div class="value">{{ $project->ppms->name ?? 'N/A' }}</div>
                 </div>
+                @if(!request('filter.pr_number_no_invoice'))
                 <div class="info-box value">
                     <div class="label">
                         <i class="fas fa-dollar-sign" style="color: #ffc107;"></i> Value
                     </div>
                     <div class="value">{{ number_format($project->value ?? 0, 0) }} SAR</div>
                 </div>
+                @endif
                 <div class="info-box date">
                     <div class="label">
                         <i class="fas fa-calendar-alt" style="color: #17a2b8;"></i> PO Date
@@ -481,7 +483,7 @@
                     <div class="date-label">
                         <i class="fas fa-calendar-check"></i> Expected Completion Date
                     </div>
-                    <div class="date-value">{{ $project->latestStatus && $project->latestStatus->date_time ? \Carbon\Carbon::parse($project->latestStatus->date_time)->format('d/m/Y (H:i)') : 'Not Set' }}</div>
+                    <div class="date-value">{{ $project->latestStatus && $project->latestStatus->expected_completion ? \Carbon\Carbon::parse($project->latestStatus->expected_completion)->format('d/m/Y') : 'Not Set' }}</div>
                 </div>
             </div>
 
@@ -554,6 +556,7 @@
                 </div>
 
                 {{-- Invoices --}}
+                @if(!request('filter.pr_number_no_invoice'))
                 <div class="detail-card invoices">
                     <div class="card-title">Invoices</div>
                     <div class="card-content">
@@ -575,6 +578,7 @@
                         <div class="detail-summary">{{ $paidInvoices }}/{{ $project->invoices->count() }} Paid</div>
                     </div>
                 </div>
+                @endif
 
                 {{-- DNs (Delivery Notes) --}}
                 <div class="detail-card dns">
